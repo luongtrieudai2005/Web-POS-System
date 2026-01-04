@@ -1,7 +1,7 @@
 <?php
 /**
  * Dashboard Page
- * Trang chu sau khi dang nhap
+ * File nay duoc goi tu Router, KHONG CAN require bootstrap
  */
 
 // Kiem tra da dang nhap chua
@@ -9,7 +9,7 @@ Auth::requireLogin();
 
 // Neu la first login thi bat buoc doi mat khau
 if (Auth::requirePasswordChange()) {
-    Router::redirect(Router::url('first-login.php'));
+    Router::redirect(Router::url('first-login'));
     exit;
 }
 
@@ -38,6 +38,7 @@ $todayRevenue = $db->fetchOne(
     "SELECT IFNULL(SUM(total_amount), 0) as total FROM orders WHERE DATE(created_at) = CURDATE()"
 )['total'];
 
+// Hien thi view (duoi day la HTML)
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -102,7 +103,9 @@ $todayRevenue = $db->fetchOne(
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#"><?php echo APP_NAME; ?></a>
+            <a class="navbar-brand fw-bold" href="<?php echo Router::url('dashboard'); ?>">
+                <?php echo APP_NAME; ?>
+            </a>
             <div class="navbar-nav ms-auto">
                 <span class="navbar-text text-white me-3">
                     Xin chao, <strong><?php echo Helper::escape($user['full_name']); ?></strong>
@@ -110,7 +113,7 @@ $todayRevenue = $db->fetchOne(
                         <span class="badge bg-warning text-dark">Admin</span>
                     <?php endif; ?>
                 </span>
-                <a href="<?php echo Router::url('logout.php'); ?>" class="btn btn-outline-light btn-sm">
+                <a href="<?php echo Router::url('logout'); ?>" class="btn btn-outline-light btn-sm">
                     Dang xuat
                 </a>
             </div>
@@ -196,22 +199,6 @@ $todayRevenue = $db->fetchOne(
                         <?php echo Helper::formatMoney($todayRevenue); ?>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Thong bao -->
-        <div class="mt-5">
-            <div class="alert alert-info">
-                <h5>Chuc nang dang phat trien</h5>
-                <p class="mb-0">
-                    Day chi la trang Dashboard don gian. Cac chuc nang chinh se duoc phat trien o cac buoc tiep theo:
-                </p>
-                <ul class="mt-2">
-                    <li>Quan ly nhan vien (Admin)</li>
-                    <li>Quan ly san pham</li>
-                    <li>Giao dich ban hang (POS)</li>
-                    <li>Bao cao thong ke</li>
-                </ul>
             </div>
         </div>
     </div>

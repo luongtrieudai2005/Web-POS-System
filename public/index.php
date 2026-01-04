@@ -1,7 +1,7 @@
 <?php
 /**
  * Entry Point - Bootstrap File
- * File nay la diem khoi dau cua ung dung
+ * Tat ca request deu di qua file nay
  */
 
 // Load cac file config
@@ -14,9 +14,8 @@ require_once __DIR__ . '/../core/Database.php';
 require_once __DIR__ . '/../core/Session.php';
 require_once __DIR__ . '/../core/Router.php';
 require_once __DIR__ . '/../core/Auth.php';
-require_once __DIR__ . '/../core/Validator.php';
-require_once __DIR__ . '/../core/Mailer.php';
 require_once __DIR__ . '/../core/Helper.php';
+require_once __DIR__ . '/../core/Validator.php';  // ← THÊM VALIDATOR
 
 // Khoi tao session
 Session::start();
@@ -31,18 +30,20 @@ $router = new Router();
 // Trang chu - Redirect den dashboard hoac login
 $router->get('/', function() {
     if (Auth::check()) {
-        Router::redirect(Router::url('dashboard.php'));
+        Router::redirect(Router::url('dashboard'));
     } else {
-        Router::redirect(Router::url('login.php'));
+        Router::redirect(Router::url('login'));
     }
 });
 
-// Trang login
+// ===== AUTH ROUTES =====
+
+// Login - GET (hien form)
 $router->get('/login', function() {
     require __DIR__ . '/login.php';
 });
 
-// Xu ly login (POST)
+// Login - POST (xu ly submit)
 $router->post('/login', function() {
     require __DIR__ . '/login.php';
 });
@@ -50,19 +51,25 @@ $router->post('/login', function() {
 // Logout
 $router->get('/logout', function() {
     Auth::logout();
-    Router::redirect(Router::url('login.php'));
+    Session::setFlash('success', 'Da dang xuat thanh cong!', 'success');
+    Router::redirect(Router::url('login'));
 });
+
+// First login - GET
+$router->get('/first-login', function() {
+    require __DIR__ . '/first-login.php';
+});
+
+// First login - POST
+$router->post('/first-login', function() {
+    require __DIR__ . '/first-login.php';
+});
+
+// ===== PROTECTED ROUTES =====
 
 // Dashboard (trang chu sau khi login)
 $router->get('/dashboard', function() {
-    Auth::requireLogin();
     require __DIR__ . '/dashboard.php';
-});
-
-// First login - Doi mat khau lan dau
-$router->get('/first-login', function() {
-    Auth::requireLogin();
-    require __DIR__ . '/first-login.php';
 });
 
 // Profile
@@ -71,7 +78,9 @@ $router->get('/profile', function() {
     require __DIR__ . '/profile.php';
 });
 
-// Users management (Admin only)
+// ===== ADMIN ONLY ROUTES =====
+
+// Users management
 $router->get('/users', function() {
     Auth::requireAdmin();
     require __DIR__ . '/users/index.php';
@@ -82,16 +91,18 @@ $router->get('/users/create', function() {
     require __DIR__ . '/users/create.php';
 });
 
+// Categories
+$router->get('/categories', function() {
+    Auth::requireAdmin();
+    require __DIR__ . '/categories/index.php';
+});
+
+// ===== EMPLOYEE & ADMIN ROUTES =====
+
 // Products
 $router->get('/products', function() {
     Auth::requireLogin();
     require __DIR__ . '/products/index.php';
-});
-
-// Categories (Admin only)
-$router->get('/categories', function() {
-    Auth::requireAdmin();
-    require __DIR__ . '/categories/index.php';
 });
 
 // Transactions (POS)
@@ -106,7 +117,7 @@ $router->get('/reports', function() {
     require __DIR__ . '/reports/index.php';
 });
 
-// 404 Handler
+// ===== 404 HANDLER =====
 $router->setNotFound(function() {
     require __DIR__ . '/404.php';
 });
@@ -126,4 +137,3 @@ try {
         echo "Something went wrong. Please try again later.";
     }
 }
-?>

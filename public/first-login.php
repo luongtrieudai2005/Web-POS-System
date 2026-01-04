@@ -1,7 +1,7 @@
 <?php
 /**
  * First Login Page
- * Trang bat buoc doi mat khau cho nhan vien moi
+ * File nay duoc goi tu Router, KHONG CAN require bootstrap
  */
 
 // Kiem tra da dang nhap chua
@@ -9,12 +9,11 @@ Auth::requireLogin();
 
 // Neu khong phai first login thi redirect ve dashboard
 if (!Auth::requirePasswordChange()) {
-    Router::redirect(Router::url('dashboard.php'));
+    Router::redirect(Router::url('dashboard'));
     exit;
 }
 
 $errors = [];
-$success = false;
 
 // XU LY DOI MAT KHAU
 if (Helper::isPost()) {
@@ -39,7 +38,7 @@ if (Helper::isPost()) {
             if ($result) {
                 // Thanh cong
                 Session::setFlash('success', 'Doi mat khau thanh cong! Ban co the su dung he thong binh thuong.', 'success');
-                Router::redirect(Router::url('dashboard.php'));
+                Router::redirect(Router::url('dashboard'));
                 exit;
             } else {
                 $errors['general'] = 'Co loi xay ra. Vui long thu lai.';

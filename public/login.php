@@ -1,12 +1,12 @@
 <?php
 /**
  * Login Page
- * Xu ly ca dang nhap binh thuong va dang nhap qua token
+ * File nay duoc goi tu Router, KHONG CAN require bootstrap
  */
 
 // Neu da dang nhap roi thi redirect ve dashboard
 if (Auth::check()) {
-    Router::redirect(Router::url('dashboard.php'));
+    Router::redirect(Router::url('dashboard'));
     exit;
 }
 
@@ -20,9 +20,8 @@ if (!empty($token) && Helper::isGet()) {
         $user = Auth::loginWithToken($token);
         
         if ($user) {
-            // Dang nhap thanh cong, redirect den trang doi mat khau
             Session::setFlash('success', 'Dang nhap thanh cong! Vui long tao mat khau moi.', 'success');
-            Router::redirect(Router::url('first-login.php'));
+            Router::redirect(Router::url('first-login'));
             exit;
         } else {
             $errors['token'] = 'Lien ket dang nhap khong hop le hoac da het han. Vui long lien he quan tri vien de gui lai email.';
@@ -40,15 +39,15 @@ if (Helper::isPost()) {
     // Validation
     $validator = new Validator($_POST);
     $validator->validate([
-        'username' => 'required',
-        'password' => 'required'
+        'username' => 'required|min:3|max:50',
+        'password' => 'required|min:3'
     ]);
     
     if ($validator->fails()) {
         $errors = $validator->errors();
     } else {
         try {
-            // Kiem tra xem co phai nhan vien moi chua dang nhap lan dau khong
+            // Kiem tra nhan vien moi chua dang nhap lan dau
             $db = Database::getInstance();
             $checkUser = $db->fetchOne(
                 "SELECT is_first_login FROM users WHERE username = ?",
@@ -57,7 +56,7 @@ if (Helper::isPost()) {
             
             // Neu la nhan vien moi (is_first_login = 1) thi KHONG cho phep dang nhap truc tiep
             if ($checkUser && $checkUser['is_first_login'] == 1) {
-                $errors['username'] = 'Vui long dang nhap bang cach nhan vao lien ket trong email cua ban.';
+                $errors['username'] = ['Vui long dang nhap bang cach nhan vao lien ket trong email cua ban.'];
             } else {
                 // Dang nhap binh thuong
                 $user = Auth::login($username, $password);
@@ -65,9 +64,7 @@ if (Helper::isPost()) {
                 if ($user) {
                     // Dang nhap thanh cong
                     Session::setFlash('success', 'Chao mung ' . $user['full_name'] . '!', 'success');
-                    
-                    // Redirect den dashboard
-                    Router::redirect(Router::url('dashboard.php'));
+                    Router::redirect(Router::url('dashboard'));
                     exit;
                 } else {
                     $errors['login'] = 'Ten dang nhap hoac mat khau khong chinh xac.';
