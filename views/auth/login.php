@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dang nhap - <?php echo APP_NAME; ?></title>
-    
-    <!-- Bootstrap CSS -->
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Custom CSS -->
@@ -159,7 +158,7 @@
                     <?php endif; ?>
                     
                     <!-- Form dang nhap -->
-                    <form method="POST" action="<?php echo Router::url('login.php'); ?>">
+                    <form method="POST" action="<?php echo Router::url('login'); ?>">
                         <!-- Username -->
                         <div class="mb-3">
                             <label for="username" class="form-label">Ten dang nhap</label>
@@ -206,7 +205,6 @@
                             Dang nhap
                         </button>
                     </form>
-                    
                     <!-- Huong dan -->
                     <div class="mt-4 p-3" style="background: #f8f9fa; border-radius: 10px; border-left: 4px solid #667eea;">
                         <p class="mb-2" style="font-size: 14px; font-weight: 600; color: #333;">
@@ -234,4 +232,5 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
+</html> -->
+

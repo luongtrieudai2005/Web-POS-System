@@ -230,7 +230,7 @@
                         </button>
                         
                         <!-- Logout Button -->
-                        <a href="<?php echo Router::url('logout.php'); ?>" class="btn btn-logout">
+                        <a href="<?php echo Router::url('logout'); ?>" class="btn btn-logout">
                             Dang xuat
                         </a>
                     </form>
