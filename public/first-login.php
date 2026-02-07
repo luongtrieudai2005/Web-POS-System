@@ -1,15 +1,18 @@
 <?php
 /**
  * First Login Page
- * File nay duoc goi tu Router, KHONG CAN require bootstrap
+ * Trang bat buoc doi mat khau cho nhan vien moi
  */
+
+// Load bootstrap
+require_once __DIR__ . '/../config/bootstrap.php';
 
 // Kiem tra da dang nhap chua
 Auth::requireLogin();
 
 // Neu khong phai first login thi redirect ve dashboard
 if (!Auth::requirePasswordChange()) {
-    Router::redirect(Router::url('dashboard'));
+    Router::redirect(Router::url('dashboard.php'));
     exit;
 }
 
@@ -37,11 +40,11 @@ if (Helper::isPost()) {
             
             if ($result) {
                 // Thanh cong
-                Session::setFlash('success', 'Doi mat khau thanh cong! Ban co the su dung he thong binh thuong.', 'success');
-                Router::redirect(Router::url('dashboard'));
+                Session::setFlash('success', 'Đổi mật khẩu thành công! Bạn có thể sử dụng hệ thống bình thường.', 'success');
+                Router::redirect(Router::url('dashboard.php'));
                 exit;
             } else {
-                $errors['general'] = 'Co loi xay ra. Vui long thu lai.';
+                $errors['general'] = 'Có lỗi xảy ra. Vui lòng thử lại.';
             }
         } catch (Exception $e) {
             $errors['general'] = $e->getMessage();

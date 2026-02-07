@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dang nhap - <?php echo APP_NAME; ?></title>
+    <title>Đăng nhập - <?php echo APP_NAME; ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Custom CSS -->
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -102,22 +101,6 @@
             font-size: 13px;
             color: #666;
         }
-        
-        .icon-input {
-            position: relative;
-        }
-        
-        .icon-input i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-        }
-        
-        .icon-input .form-control {
-            padding-left: 45px;
-        }
     </style>
 </head>
 <body>
@@ -127,7 +110,7 @@
                 <!-- Header -->
                 <div class="login-header">
                     <h2><?php echo APP_NAME; ?></h2>
-                    <p>He thong quan ly ban hang</p>
+                    <p>Hệ thống quản lý bán hàng</p>
                 </div>
                 
                 <!-- Body -->
@@ -135,7 +118,7 @@
                     <!-- Thong bao loi token -->
                     <?php if (isset($errors['token'])): ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>Loi!</strong> <?php echo Helper::escape($errors['token']); ?>
+                            <strong>Lỗi!</strong> <?php echo Helper::escape($errors['token']); ?>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     <?php endif; ?>
@@ -143,7 +126,7 @@
                     <!-- Thong bao loi dang nhap -->
                     <?php if (isset($errors['login'])): ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <strong>Loi!</strong> <?php echo Helper::escape($errors['login']); ?>
+                            <strong>Lỗi!</strong> <?php echo Helper::escape($errors['login']); ?>
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     <?php endif; ?>
@@ -161,14 +144,14 @@
                     <form method="POST" action="<?php echo Router::url('login'); ?>">
                         <!-- Username -->
                         <div class="mb-3">
-                            <label for="username" class="form-label">Ten dang nhap</label>
+                            <label for="username" class="form-label">Tên đăng nhập</label>
                             <input 
                                 type="text" 
                                 class="form-control <?php echo isset($errors['username']) ? 'is-invalid' : ''; ?>" 
                                 id="username" 
                                 name="username" 
                                 value="<?php echo Helper::escape($username); ?>"
-                                placeholder="Nhap ten dang nhap"
+                                placeholder="Nhập tên đăng nhập"
                                 autofocus
                                 required
                             >
@@ -178,19 +161,19 @@
                                 </div>
                             <?php endif; ?>
                             <small class="form-text text-muted">
-                                Vi du: admin (phan truoc dau @ cua email)
+                                Ví dụ: admin (phần trước dấu @ của email)
                             </small>
                         </div>
                         
                         <!-- Password -->
                         <div class="mb-4">
-                            <label for="password" class="form-label">Mat khau</label>
+                            <label for="password" class="form-label">Mật khẩu</label>
                             <input 
                                 type="password" 
                                 class="form-control <?php echo isset($errors['password']) ? 'is-invalid' : ''; ?>" 
                                 id="password" 
                                 name="password" 
-                                placeholder="Nhap mat khau"
+                                placeholder="Nhập mật khẩu"
                                 required
                             >
                             <?php if (isset($errors['password'])): ?>
@@ -202,21 +185,22 @@
                         
                         <!-- Submit Button -->
                         <button type="submit" class="btn btn-login">
-                            Dang nhap
+                            Đăng nhập
                         </button>
                     </form>
+                    
                     <!-- Huong dan -->
                     <div class="mt-4 p-3" style="background: #f8f9fa; border-radius: 10px; border-left: 4px solid #667eea;">
                         <p class="mb-2" style="font-size: 14px; font-weight: 600; color: #333;">
-                            Thong tin dang nhap mac dinh:
+                            Thông tin đăng nhập mặc định:
                         </p>
                         <ul class="mb-0" style="font-size: 13px; color: #666;">
-                            <li>Ten dang nhap: <strong>admin</strong></li>
-                            <li>Mat khau: <strong>admin</strong></li>
+                            <li>Tên đăng nhập: <strong>admin</strong></li>
+                            <li>Mật khẩu: <strong>admin</strong></li>
                         </ul>
                         <hr style="margin: 15px 0;">
                         <p class="mb-0" style="font-size: 13px; color: #666;">
-                            <strong>Nhan vien moi:</strong> Vui long dang nhap bang lien ket trong email.
+                            <strong>Nhân viên mới:</strong> Vui lòng đăng nhập bằng liên kết trong email.
                         </p>
                     </div>
                 </div>
@@ -232,5 +216,4 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> -->
-
+</html>

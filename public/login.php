@@ -1,6 +1,7 @@
 <?php
 /**
- * Login Page - WITH DEBUG
+ * Login Page
+ * Xu ly ca dang nhap binh thuong va dang nhap qua token
  */
 
 // Neu da dang nhap roi thi redirect ve dashboard
@@ -12,7 +13,6 @@ if (Auth::check()) {
 $errors = [];
 $username = '';
 $token = Helper::get('token', '');
-$debug = []; // THÊM DEBUG ARRAY
 
 // XU LY DANG NHAP QUA TOKEN (Nhan vien moi)
 if (!empty($token) && Helper::isGet()) {
@@ -20,11 +20,11 @@ if (!empty($token) && Helper::isGet()) {
         $user = Auth::loginWithToken($token);
         
         if ($user) {
-            Session::setFlash('success', 'Dang nhap thanh cong! Vui long tao mat khau moi.', 'success');
+            Session::setFlash('success', 'Đăng nhập thành công! Vui lòng tạo mật khẩu mới.', 'success');
             Router::redirect(Router::url('first-login'));
             exit;
         } else {
-            $errors['token'] = 'Lien ket dang nhap khong hop le hoac da het han. Vui long lien he quan tri vien de gui lai email.';
+            $errors['token'] = 'Liên kết đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng liên hệ quản trị viên để gửi lại email.';
         }
     } catch (Exception $e) {
         $errors['token'] = $e->getMessage();
@@ -36,10 +36,6 @@ if (Helper::isPost()) {
     $username = Helper::post('username', '');
     $password = Helper::post('password', '');
     
-    // DEBUG: Log input
-    $debug[] = "Username nhập: '$username'";
-    $debug[] = "Password nhập: '$password'";
-    
     // Validation
     $validator = new Validator($_POST);
     $validator->validate([
@@ -49,53 +45,32 @@ if (Helper::isPost()) {
     
     if ($validator->fails()) {
         $errors = $validator->errors();
-        $debug[] = "Validation FAILED: " . json_encode($errors);
     } else {
-        $debug[] = "Validation PASSED";
-        
         try {
-            // DEBUG: Check user in DB
+            // Kiem tra xem co phai nhan vien moi chua dang nhap lan dau khong
             $db = Database::getInstance();
             $checkUser = $db->fetchOne(
-                "SELECT * FROM users WHERE username = ?",
+                "SELECT is_first_login FROM users WHERE username = ?",
                 [$username]
             );
             
-            if (!$checkUser) {
-                $debug[] = "❌ User KHÔNG tồn tại trong DB";
-            } else {
-                $debug[] = "✅ User TÌM THẤY trong DB";
-                $debug[] = "is_first_login: " . $checkUser['is_first_login'];
-                $debug[] = "status: " . $checkUser['status'];
-                $debug[] = "Password hash: " . substr($checkUser['password'], 0, 30) . "...";
-                
-                // Test password verify
-                $isPasswordCorrect = password_verify($password, $checkUser['password']);
-                $debug[] = "password_verify() result: " . ($isPasswordCorrect ? "TRUE" : "FALSE");
-            }
-            
             // Neu la nhan vien moi (is_first_login = 1) thi KHONG cho phep dang nhap truc tiep
             if ($checkUser && $checkUser['is_first_login'] == 1) {
-                $debug[] = "❌ REJECT: Nhân viên mới phải dùng link email";
-                $errors['username'] = ['Vui long dang nhap bang cach nhan vao lien ket trong email cua ban.'];
+                $errors['username'] = ['Vui lòng đăng nhập bằng cách nhấn vào liên kết trong email của bạn.'];
             } else {
                 // Dang nhap binh thuong
-                $debug[] = "Gọi Auth::login()...";
                 $user = Auth::login($username, $password);
                 
                 if ($user) {
-                    $debug[] = "✅ LOGIN THÀNH CÔNG!";
                     // Dang nhap thanh cong
-                    Session::setFlash('success', 'Chao mung ' . $user['full_name'] . '!', 'success');
+                    Session::setFlash('success', 'Chào mừng ' . $user['full_name'] . '!', 'success');
                     Router::redirect(Router::url('dashboard'));
                     exit;
                 } else {
-                    $debug[] = "❌ Auth::login() returned FALSE";
-                    $errors['login'] = 'Ten dang nhap hoac mat khau khong chinh xac.';
+                    $errors['login'] = 'Tên đăng nhập hoặc mật khẩu không chính xác.';
                 }
             }
         } catch (Exception $e) {
-            $debug[] = "❌ EXCEPTION: " . $e->getMessage();
             $errors['login'] = $e->getMessage();
         }
     }

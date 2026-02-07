@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>404 - Khong tim thay trang</title>
+    <title>404 - Không tìm thấy trang</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -61,12 +61,12 @@
 <body>
     <div class="error-container">
         <div class="error-code">404</div>
-        <div class="error-message">Khong tim thay trang</div>
+        <div class="error-message">Không tìm thấy trang</div>
         <div class="error-description">
-            Trang ban dang tim kiem khong ton tai hoac da bi xoa.
+            Trang bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
         </div>
         <a href="<?php echo Router::url('/'); ?>" class="btn-home">
-            Quay lai trang chu
+            Quay lại trang chủ
         </a>
     </div>
 </body>
