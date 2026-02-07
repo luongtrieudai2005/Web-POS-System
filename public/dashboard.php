@@ -4,6 +4,8 @@
  * Trang chu sau khi dang nhap
  */
 
+// QUAN TRONG: Load bootstrap TRUOC TIEN!
+require_once __DIR__ . '/../config/bootstrap.php';
 
 // Kiem tra da dang nhap chua
 Auth::requireLogin();
@@ -136,7 +138,7 @@ $todayRevenue = $db->fetchOne(
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        <i class="bi bi-box-seam"></i>
+                        SP
                     </div>
                     <div class="stats-label">Tổng sản phẩm</div>
                     <div class="stats-value"><?php echo number_format($totalProducts); ?></div>
@@ -147,7 +149,7 @@ $todayRevenue = $db->fetchOne(
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                        <i class="bi bi-people"></i>
+                        KH
                     </div>
                     <div class="stats-label">Tổng khách hàng</div>
                     <div class="stats-value"><?php echo number_format($totalCustomers); ?></div>
@@ -158,7 +160,7 @@ $todayRevenue = $db->fetchOne(
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                        <i class="bi bi-cart"></i>
+                        DH
                     </div>
                     <div class="stats-label">Tổng đơn hàng</div>
                     <div class="stats-value"><?php echo number_format($totalOrders); ?></div>
@@ -169,7 +171,7 @@ $todayRevenue = $db->fetchOne(
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                        <i class="bi bi-cash-stack"></i>
+                        DT
                     </div>
                     <div class="stats-label">Tổng doanh thu</div>
                     <div class="stats-value" style="font-size: 20px;">
