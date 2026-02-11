@@ -53,7 +53,7 @@ class Mailer {
             }
             
         } catch (Exception $e) {
-            throw new Exception("Không thể cấu hình email: " . $e->getMessage());
+            throw new Exception("Khong the cau hinh email: " . $e->getMessage());
         }
     }
     

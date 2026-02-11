@@ -1,18 +1,15 @@
 <?php
 /**
  * Dashboard Page
- * Trang chu sau khi dang nhap
+ * File nay duoc goi tu Router, KHONG CAN require bootstrap
  */
-
-// QUAN TRONG: Load bootstrap TRUOC TIEN!
-require_once __DIR__ . '/../config/bootstrap.php';
 
 // Kiem tra da dang nhap chua
 Auth::requireLogin();
 
 // Neu la first login thi bat buoc doi mat khau
 if (Auth::requirePasswordChange()) {
-    Router::redirect(Router::url('first-login.php'));
+    Router::redirect(Router::url('first-login'));
     exit;
 }
 
@@ -41,6 +38,7 @@ $todayRevenue = $db->fetchOne(
     "SELECT IFNULL(SUM(total_amount), 0) as total FROM orders WHERE DATE(created_at) = CURDATE()"
 )['total'];
 
+// Hien thi view (duoi day la HTML)
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -49,6 +47,7 @@ $todayRevenue = $db->fetchOne(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - <?php echo APP_NAME; ?></title>
     
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
@@ -104,16 +103,18 @@ $todayRevenue = $db->fetchOne(
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#"><?php echo APP_NAME; ?></a>
+            <a class="navbar-brand fw-bold" href="<?php echo Router::url('dashboard'); ?>">
+                <?php echo APP_NAME; ?>
+            </a>
             <div class="navbar-nav ms-auto">
                 <span class="navbar-text text-white me-3">
-                    Xin chào, <strong><?php echo Helper::escape($user['full_name']); ?></strong>
+                    Xin chao, <strong><?php echo Helper::escape($user['full_name']); ?></strong>
                     <?php if (Auth::isAdmin()): ?>
                         <span class="badge bg-warning text-dark">Admin</span>
                     <?php endif; ?>
                 </span>
-                <a href="<?php echo Router::url('logout.php'); ?>" class="btn btn-outline-light btn-sm">
-                    Đăng xuất
+                <a href="<?php echo Router::url('logout'); ?>" class="btn btn-outline-light btn-sm">
+                    Dang xuat
                 </a>
             </div>
         </div>
@@ -130,7 +131,7 @@ $todayRevenue = $db->fetchOne(
             </div>
         <?php endif; ?>
         
-        <h2 class="mb-4">Trang chủ</h2>
+        <h2 class="mb-4">Dashboard</h2>
         
         <!-- Thong ke -->
         <div class="row g-4">
@@ -138,9 +139,9 @@ $todayRevenue = $db->fetchOne(
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                        SP
+                        📦
                     </div>
-                    <div class="stats-label">Tổng sản phẩm</div>
+                    <div class="stats-label">Tong san pham</div>
                     <div class="stats-value"><?php echo number_format($totalProducts); ?></div>
                 </div>
             </div>
@@ -149,9 +150,9 @@ $todayRevenue = $db->fetchOne(
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                        KH
+                        👥
                     </div>
-                    <div class="stats-label">Tổng khách hàng</div>
+                    <div class="stats-label">Tong khach hang</div>
                     <div class="stats-value"><?php echo number_format($totalCustomers); ?></div>
                 </div>
             </div>
@@ -160,9 +161,9 @@ $todayRevenue = $db->fetchOne(
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                        DH
+                        🛒
                     </div>
-                    <div class="stats-label">Tổng đơn hàng</div>
+                    <div class="stats-label">Tong don hang</div>
                     <div class="stats-value"><?php echo number_format($totalOrders); ?></div>
                 </div>
             </div>
@@ -171,9 +172,9 @@ $todayRevenue = $db->fetchOne(
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                        DT
+                        💰
                     </div>
-                    <div class="stats-label">Tổng doanh thu</div>
+                    <div class="stats-label">Tong doanh thu</div>
                     <div class="stats-value" style="font-size: 20px;">
                         <?php echo Helper::formatMoney($totalRevenue); ?>
                     </div>
@@ -182,38 +183,22 @@ $todayRevenue = $db->fetchOne(
         </div>
         
         <!-- Thong ke hom nay -->
-        <h4 class="mt-5 mb-3">Hôm nay</h4>
+        <h4 class="mt-5 mb-3">Hom nay</h4>
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="stats-card">
-                    <div class="stats-label">Đơn hàng hôm nay</div>
+                    <div class="stats-label">Don hang hom nay</div>
                     <div class="stats-value text-primary"><?php echo number_format($todayOrders); ?></div>
                 </div>
             </div>
             
             <div class="col-md-6">
                 <div class="stats-card">
-                    <div class="stats-label">Doanh thu hôm nay</div>
+                    <div class="stats-label">Doanh thu hom nay</div>
                     <div class="stats-value text-success" style="font-size: 24px;">
                         <?php echo Helper::formatMoney($todayRevenue); ?>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Thong bao -->
-        <div class="mt-5">
-            <div class="alert alert-info">
-                <h5>Chức năng đang phát triển</h5>
-                <p class="mb-0">
-                    Đây chỉ là trang Dashboard đơn giản. Các chức năng chính sẽ được phát triển ở các bước tiếp theo:
-                </p>
-                <ul class="mt-2">
-                    <li>Quản lý nhân viên (Admin)</li>
-                    <li>Quản lý sản phẩm</li>
-                    <li>Giao dịch bán hàng (POS)</li>
-                    <li>Báo cáo thống kê</li>
-                </ul>
             </div>
         </div>
     </div>

@@ -1,10 +1,4 @@
 <?php
-/**
- * Login Page
- * Xu ly ca dang nhap binh thuong va dang nhap qua token
- */
-
-// QUAN TRONG: Load bootstrap TRUOC TIEN!
 require_once __DIR__ . '/../config/bootstrap.php';
 
 // Neu da dang nhap roi thi redirect ve dashboard

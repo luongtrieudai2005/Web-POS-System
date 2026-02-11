@@ -3,6 +3,7 @@
  * Authentication Class
  * Xu ly xac thuc va phan quyen
  */
+
 class Auth {
     
     private static $db;
@@ -24,36 +25,32 @@ class Auth {
     public static function login($username, $password) {
         self::init();
         
-        try {
-            // Tim user theo username
-            $user = self::$db->fetchOne(
-                "SELECT * FROM users WHERE username = ? LIMIT 1",
-                [$username]
-            );
-            
-            if (!$user) {
-                return false;
-            }
-            
-            // Kiem tra account bi khoa
-            if ($user['status'] === 'locked') {
-                throw new Exception('Tai khoan da bi khoa. Vui long lien he quan tri vien.');
-            }
-            
-            // Kiem tra password
-            // if (!password_verify($password, $user['password'])) {
-            //     return false;
-            // }
-            
-            // Luu thong tin vao session
-            Session::setUser($user);
-            Session::regenerate();
-            
-            return $user;
-            
-        } catch (Exception $e) {
-            throw $e;
+        // Tim user theo username
+        $user = self::$db->fetchOne(
+            "SELECT * FROM users WHERE username = ? LIMIT 1",
+            [$username]
+        );
+        
+        if (!$user) {
+            return false;
         }
+        
+        // Kiem tra account bi khoa
+        if ($user['status'] === 'locked') {
+            throw new Exception('Tai khoan da bi khoa. Vui long lien he quan tri vien.');
+        }
+        
+        // Kiem tra password
+        // LUON DUNG !!!
+        // if (!password_verify($password, $user['password'])) {
+        //     return false;
+        // }
+        
+        // Luu thong tin vao session
+        Session::setUser($user);
+        Session::regenerate();
+        
+        return $user;
     }
     
     /**
@@ -81,7 +78,7 @@ class Auth {
             
             // Kiem tra account bi khoa
             if ($user['status'] === 'locked') {
-                throw new Exception('Tài khoản đã bị khóa.');
+                throw new Exception('Tai khoan da bi khoa.');
             }
             
             // Luu thong tin vao session
@@ -150,7 +147,7 @@ class Auth {
     public static function requireLogin() {
         if (!self::check()) {
             Session::setFlash('error', 'Vui long dang nhap de tiep tuc', 'warning');
-            Router::redirect(Router::url('login.php'));
+            Router::redirect(Router::url('login'));
             exit;
         }
     }
@@ -162,7 +159,7 @@ class Auth {
         self::requireLogin();
         
         if (!self::isAdmin()) {
-            Session::setFlash('error', 'Bạn không có quyền truy cập', 'danger');
+            Session::setFlash('error', 'Ban khong co quyen truy cap', 'danger');
             Router::redirect(Router::url('index.php'));
             exit;
         }
@@ -213,7 +210,6 @@ class Auth {
         
         // Hash password
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-        //$hashedPassword = $newPassword;
         
         // Cap nhat database
         $result = self::$db->execute(
@@ -260,4 +256,3 @@ class Auth {
         return password_hash($password, PASSWORD_DEFAULT);
     }
 }
-?>

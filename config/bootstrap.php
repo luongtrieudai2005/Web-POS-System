@@ -7,9 +7,9 @@
  */
 
 // Load cac file config
-require_once __DIR__ . '/database.php';
-require_once __DIR__ . '/app.php';
-require_once __DIR__ . '/constants.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/app.php';
+require_once __DIR__ . '/../config/constants.php';
 
 // Load cac core class theo thu tu (quan trong vi co dependency)
 require_once __DIR__ . '/../core/Database.php';
