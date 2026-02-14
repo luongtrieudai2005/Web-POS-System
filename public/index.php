@@ -15,7 +15,7 @@ require_once __DIR__ . '/../core/Session.php';
 require_once __DIR__ . '/../core/Router.php';
 require_once __DIR__ . '/../core/Auth.php';
 require_once __DIR__ . '/../core/Helper.php';
-require_once __DIR__ . '/../core/Validator.php';  // ← THÊM VALIDATOR
+require_once __DIR__ . '/../core/Validator.php';
 
 // Khoi tao session
 Session::start();
