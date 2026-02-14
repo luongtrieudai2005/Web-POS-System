@@ -1,44 +1,30 @@
 <?php
-/**
- * Dashboard Page
- * File nay duoc goi tu Router, KHONG CAN require bootstrap
- */
+require_once __DIR__ . '/../config/bootstrap.php';
 
-// Kiem tra da dang nhap chua
 Auth::requireLogin();
 
-// Neu la first login thi bat buoc doi mat khau
 if (Auth::requirePasswordChange()) {
     Router::redirect(Router::url('first-login'));
     exit;
 }
 
-// Lay thong tin user
 $user = Auth::user();
-
-// Lay thong tin thong ke don gian
 $db = Database::getInstance();
 
-// Dem so luong
 $totalProducts = $db->fetchOne("SELECT COUNT(*) as count FROM products")['count'];
 $totalCustomers = $db->fetchOne("SELECT COUNT(*) as count FROM customers")['count'];
 $totalOrders = $db->fetchOne("SELECT COUNT(*) as count FROM orders")['count'];
 
-// Tinh tong doanh thu
 $revenue = $db->fetchOne("SELECT IFNULL(SUM(total_amount), 0) as total FROM orders");
 $totalRevenue = $revenue['total'];
 
-// Don hang hom nay
 $todayOrders = $db->fetchOne(
     "SELECT COUNT(*) as count FROM orders WHERE DATE(created_at) = CURDATE()"
 )['count'];
 
-// Doanh thu hom nay
 $todayRevenue = $db->fetchOne(
     "SELECT IFNULL(SUM(total_amount), 0) as total FROM orders WHERE DATE(created_at) = CURDATE()"
 )['total'];
-
-// Hien thi view (duoi day la HTML)
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -47,7 +33,6 @@ $todayRevenue = $db->fetchOne(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - <?php echo APP_NAME; ?></title>
     
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
@@ -59,6 +44,35 @@ $todayRevenue = $db->fetchOne(
         .navbar {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white !important;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 10px;
+            margin-top: 8px;
+        }
+        
+        .dropdown-item {
+            padding: 10px 20px;
+            transition: all 0.3s;
+        }
+        
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
         
         .stats-card {
@@ -97,32 +111,103 @@ $todayRevenue = $db->fetchOne(
             font-size: 14px;
             font-weight: 600;
         }
+        
+        .quick-actions {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-top: 30px;
+        }
+        
+        .btn-quick {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-quick:hover {
+            transform: translateX(5px);
+        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="<?php echo Router::url('dashboard'); ?>">
                 <?php echo APP_NAME; ?>
             </a>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text text-white me-3">
-                    Xin chao, <strong><?php echo Helper::escape($user['full_name']); ?></strong>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="<?php echo Router::url('dashboard'); ?>">
+                            Dashboard
+                        </a>
+                    </li>
+                    
                     <?php if (Auth::isAdmin()): ?>
-                        <span class="badge bg-warning text-dark">Admin</span>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            Quan ly
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="<?php echo Router::url('users/index.php'); ?>">
+                                    Quan ly nhan vien
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="<?php echo Router::url('categories/index.php'); ?>">
+                                    Danh muc san pham
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="<?php echo Router::url('products/index.php'); ?>">
+                                    Quan ly san pham
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                     <?php endif; ?>
-                </span>
-                <a href="<?php echo Router::url('logout'); ?>" class="btn btn-outline-light btn-sm">
-                    Dang xuat
-                </a>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo Router::url('transactions/index.php'); ?>">
+                            Ban hang (POS)
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo Router::url('reports/index.php'); ?>">
+                            Bao cao
+                        </a>
+                    </li>
+                </ul>
+                
+                <div class="navbar-nav">
+                    <span class="navbar-text text-white me-3">
+                        <strong><?php echo Helper::escape($user['full_name']); ?></strong>
+                        <?php if (Auth::isAdmin()): ?>
+                            <span class="badge bg-warning text-dark">Admin</span>
+                        <?php endif; ?>
+                    </span>
+                    <a href="<?php echo Router::url('logout'); ?>" class="btn btn-outline-light btn-sm">
+                        Dang xuat
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
     
-    <!-- Main Content -->
     <div class="container mt-5">
-        <!-- Flash Message -->
         <?php if (Session::hasFlash('success')): ?>
             <?php $flash = Session::getFlash('success'); ?>
             <div class="alert alert-<?php echo $flash['type']; ?> alert-dismissible fade show" role="alert">
@@ -131,11 +216,12 @@ $todayRevenue = $db->fetchOne(
             </div>
         <?php endif; ?>
         
-        <h2 class="mb-4">Dashboard</h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Dashboard</h2>
+            <span class="text-muted"><?php echo Helper::formatDate(date('Y-m-d H:i:s'), 'd/m/Y H:i'); ?></span>
+        </div>
         
-        <!-- Thong ke -->
         <div class="row g-4">
-            <!-- Tong san pham -->
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
@@ -143,10 +229,12 @@ $todayRevenue = $db->fetchOne(
                     </div>
                     <div class="stats-label">Tong san pham</div>
                     <div class="stats-value"><?php echo number_format($totalProducts); ?></div>
+                    <a href="<?php echo Router::url('products/index.php'); ?>" class="btn btn-sm btn-outline-primary mt-2">
+                        Xem chi tiet
+                    </a>
                 </div>
             </div>
             
-            <!-- Tong khach hang -->
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
@@ -157,7 +245,6 @@ $todayRevenue = $db->fetchOne(
                 </div>
             </div>
             
-            <!-- Tong don hang -->
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
@@ -168,7 +255,6 @@ $todayRevenue = $db->fetchOne(
                 </div>
             </div>
             
-            <!-- Tong doanh thu -->
             <div class="col-md-3">
                 <div class="stats-card">
                     <div class="stats-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
@@ -182,7 +268,6 @@ $todayRevenue = $db->fetchOne(
             </div>
         </div>
         
-        <!-- Thong ke hom nay -->
         <h4 class="mt-5 mb-3">Hom nay</h4>
         <div class="row g-4">
             <div class="col-md-6">
@@ -201,9 +286,36 @@ $todayRevenue = $db->fetchOne(
                 </div>
             </div>
         </div>
+        
+        <?php if (Auth::isAdmin()): ?>
+        <div class="quick-actions">
+            <h5 class="mb-3">Thao tac nhanh</h5>
+            <div class="row">
+                <div class="col-md-3">
+                    <a href="<?php echo Router::url('users/create.php'); ?>" class="btn btn-primary btn-quick">
+                        + Them nhan vien
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="<?php echo Router::url('categories/index.php'); ?>" class="btn btn-info btn-quick">
+                        Danh muc
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="<?php echo Router::url('products/index.php'); ?>" class="btn btn-success btn-quick">
+                        Quan ly san pham
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="<?php echo Router::url('reports/index.php'); ?>" class="btn btn-warning btn-quick">
+                        Xem bao cao
+                    </a>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
     
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

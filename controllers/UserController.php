@@ -83,7 +83,7 @@ class UserController {
                             Session::setFlash('success', 'Tao nhan vien thanh cong! Loi gui email: ' . $e->getMessage(), 'warning');
                         }
                         
-                        Router::redirect(Router::url('users'));
+                        Router::redirect(Router::url('users/index.php'));
                         exit;
                     } else {
                         $errors['general'] = 'Co loi xay ra khi tao nhan vien';
@@ -104,7 +104,7 @@ class UserController {
         
         if (!$user) {
             Session::setFlash('error', 'Khong tim thay nhan vien', 'danger');
-            Router::redirect(Router::url('users'));
+            Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
@@ -118,13 +118,13 @@ class UserController {
         
         if (!$user) {
             Session::setFlash('error', 'Khong tim thay nhan vien', 'danger');
-            Router::redirect(Router::url('users'));
+            Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
         if ($user['id'] == 1 && Auth::id() != 1) {
             Session::setFlash('error', 'Ban khong the chinh sua tai khoan admin chinh', 'danger');
-            Router::redirect(Router::url('users'));
+            Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
@@ -161,7 +161,7 @@ class UserController {
                     
                     if ($result) {
                         Session::setFlash('success', 'Cap nhat thong tin thanh cong', 'success');
-                        Router::redirect(Router::url('users/detail/' . $id));
+                        Router::redirect(Router::url('users/detail.php?id=' . $id));
                         exit;
                     } else {
                         $errors['general'] = 'Co loi xay ra khi cap nhat';
@@ -182,13 +182,13 @@ class UserController {
         
         if (!$user) {
             Session::setFlash('error', 'Khong tim thay nhan vien', 'danger');
-            Router::redirect(Router::url('users'));
+            Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
         if ($user['is_first_login'] != 1) {
             Session::setFlash('error', 'Nhan vien da dang nhap roi', 'warning');
-            Router::redirect(Router::url('users/detail/' . $id));
+            Router::redirect(Router::url('users/detail.php?id=' . $id));
             exit;
         }
         
@@ -211,7 +211,7 @@ class UserController {
             Session::setFlash('error', 'Loi: ' . $e->getMessage(), 'danger');
         }
         
-        Router::redirect(Router::url('users/detail/' . $id));
+        Router::redirect(Router::url('users/detail.php?id=' . $id));
         exit;
     }
     
@@ -219,7 +219,7 @@ class UserController {
         Auth::requireAdmin();
         
         if (!Helper::isPost()) {
-            Router::redirect(Router::url('users'));
+            Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
@@ -227,13 +227,13 @@ class UserController {
         
         if (!$user) {
             Session::setFlash('error', 'Khong tim thay nhan vien', 'danger');
-            Router::redirect(Router::url('users'));
+            Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
         if ($user['id'] == 1) {
             Session::setFlash('error', 'Khong the thay doi trang thai admin chinh', 'danger');
-            Router::redirect(Router::url('users'));
+            Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
@@ -241,7 +241,7 @@ class UserController {
         
         if (!in_array($status, ['active', 'inactive', 'locked'])) {
             Session::setFlash('error', 'Trang thai khong hop le', 'danger');
-            Router::redirect(Router::url('users'));
+            Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
@@ -257,7 +257,7 @@ class UserController {
             Session::setFlash('error', $e->getMessage(), 'danger');
         }
         
-        Router::redirect(Router::url('users'));
+        Router::redirect(Router::url('users/index.php'));
         exit;
     }
     
@@ -265,7 +265,7 @@ class UserController {
         Auth::requireAdmin();
         
         if (!Helper::isPost()) {
-            Router::redirect(Router::url('users'));
+            Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
@@ -273,13 +273,13 @@ class UserController {
         
         if (!$user) {
             Session::setFlash('error', 'Khong tim thay nhan vien', 'danger');
-            Router::redirect(Router::url('users'));
+            Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
         if ($user['id'] == 1) {
             Session::setFlash('error', 'Khong the xoa tai khoan admin chinh', 'danger');
-            Router::redirect(Router::url('users'));
+            Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
@@ -295,7 +295,7 @@ class UserController {
             Session::setFlash('error', $e->getMessage(), 'danger');
         }
         
-        Router::redirect(Router::url('users'));
+        Router::redirect(Router::url('users/index.php'));
         exit;
     }
 }
