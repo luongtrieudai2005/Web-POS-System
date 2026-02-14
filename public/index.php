@@ -91,6 +91,11 @@ $router->get('/users/create', function() {
     require __DIR__ . '/users/create.php';
 });
 
+$router->post('/users/create', function() {
+    Auth::requireAdmin();
+    require __DIR__ . '/users/create.php';
+});
+
 // Categories
 $router->get('/categories', function() {
     Auth::requireAdmin();

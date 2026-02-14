@@ -9,6 +9,7 @@ define('APP_NAME', 'POS System');
 define('APP_VERSION', '1.0.0');
 define('APP_URL', 'http://localhost/project-root/source/public');
 
+
 // Timezone
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
@@ -33,8 +34,8 @@ define('UPLOAD_ALLOWED_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'pdf']);
 // Email Settings (cho tính năng gửi email)
 define('MAIL_HOST', 'smtp.gmail.com');
 define('MAIL_PORT', 587);
-define('MAIL_USERNAME', 'admin@gmail.com'); // Đổi sau
-define('MAIL_PASSWORD', 'admin');    // Đổi sau
+define('MAIL_USERNAME', 'luongtrieudai0902@gmail.com');
+define('MAIL_PASSWORD', 'lfxw wsox btdi umag');
 define('MAIL_FROM_EMAIL', 'noreply@possystem.com');
 define('MAIL_FROM_NAME', 'POS System');
 

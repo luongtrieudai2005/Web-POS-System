@@ -41,10 +41,9 @@ class Auth {
         }
         
         // Kiem tra password
-        // LUON DUNG !!!
-        // if (!password_verify($password, $user['password'])) {
-        //     return false;
-        // }
+        if (!password_verify($password, $user['password'])) {
+            return false;
+        }
         
         // Luu thong tin vao session
         Session::setUser($user);

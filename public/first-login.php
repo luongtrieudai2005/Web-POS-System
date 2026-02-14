@@ -1,8 +1,6 @@
 <?php
-/**
- * First Login Page
- * File nay duoc goi tu Router, KHONG CAN require bootstrap
- */
+
+require_once __DIR__ . '/../config/bootstrap.php';
 
 // Kiem tra da dang nhap chua
 Auth::requireLogin();

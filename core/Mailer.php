@@ -1,18 +1,9 @@
-<!-- <?php
-/**
- * Mailer Class
- * Gui email su dung PHPMailer
- * 
- * Yeu cau: Thu vien PHPMailer phai duoc tai ve va dat trong thu muc libraries/PHPMailer/
- * Download tai: https://github.com/PHPMailer/PHPMailer
- */
+<?php
 
-// Import PHPMailer classes
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-// Load PHPMailer
 require_once __DIR__ . '/../libraries/PHPMailer/src/Exception.php';
 require_once __DIR__ . '/../libraries/PHPMailer/src/PHPMailer.php';
 require_once __DIR__ . '/../libraries/PHPMailer/src/SMTP.php';
@@ -21,20 +12,13 @@ class Mailer {
     
     private $mailer;
     
-    /**
-     * Khoi tao PHPMailer
-     */
     public function __construct() {
         $this->mailer = new PHPMailer(true);
         $this->configure();
     }
     
-    /**
-     * Cau hinh SMTP
-     */
     private function configure() {
         try {
-            // Server settings
             $this->mailer->isSMTP();
             $this->mailer->Host       = MAIL_HOST;
             $this->mailer->SMTPAuth   = true;
@@ -44,12 +28,10 @@ class Mailer {
             $this->mailer->Port       = MAIL_PORT;
             $this->mailer->CharSet    = 'UTF-8';
             
-            // Set thong tin nguoi gui
             $this->mailer->setFrom(MAIL_FROM_EMAIL, MAIL_FROM_NAME);
             
-            // Debug (tat khi production)
             if (APP_DEBUG) {
-                $this->mailer->SMTPDebug = 0; // 0 = off, 2 = debug
+                $this->mailer->SMTPDebug = 0;
             }
             
         } catch (Exception $e) {
@@ -57,36 +39,22 @@ class Mailer {
         }
     }
     
-    /**
-     * Gui email don gian
-     * 
-     * @param string $to Email nguoi nhan
-     * @param string $subject Tieu de
-     * @param string $body Noi dung (HTML)
-     * @param string $toName Ten nguoi nhan (optional)
-     * @return bool
-     */
     public function send($to, $subject, $body, $toName = '') {
         try {
-            // Nguoi nhan
             $this->mailer->addAddress($to, $toName);
             
-            // Noi dung
             $this->mailer->isHTML(true);
             $this->mailer->Subject = $subject;
             $this->mailer->Body    = $body;
-            $this->mailer->AltBody = strip_tags($body); // Plain text cho client khong ho tro HTML
+            $this->mailer->AltBody = strip_tags($body);
             
-            // Gui
             $result = $this->mailer->send();
             
-            // Clear recipients cho lan gui tiep theo
             $this->mailer->clearAddresses();
             
             return $result;
             
         } catch (Exception $e) {
-            // Log loi (trong production nen log vao file)
             if (APP_DEBUG) {
                 echo "Email Error: {$this->mailer->ErrorInfo}";
             }
@@ -94,16 +62,8 @@ class Mailer {
         }
     }
     
-    /**
-     * Gui email dang ky cho nhan vien moi
-     * 
-     * @param string $email Email nhan vien
-     * @param string $fullName Ten nhan vien
-     * @param string $token Login token
-     * @return bool
-     */
     public function sendEmployeeRegistration($email, $fullName, $token) {
-        $loginUrl = Router::url('login.php?token=' . $token);
+        $loginUrl = Router::url('login?token=' . $token);
         
         $subject = 'Tai khoan cua ban da duoc tao';
         
@@ -112,9 +72,6 @@ class Mailer {
         return $this->send($email, $subject, $body, $fullName);
     }
     
-    /**
-     * Template email dang ky nhan vien
-     */
     private function getEmployeeRegistrationTemplate($fullName, $loginUrl) {
         return '
         <!DOCTYPE html>
@@ -171,11 +128,8 @@ class Mailer {
         ';
     }
     
-    /**
-     * Gui email quen mat khau (optional - neu can)
-     */
     public function sendPasswordReset($email, $fullName, $resetToken) {
-        $resetUrl = Router::url('reset-password.php?token=' . $resetToken);
+        $resetUrl = Router::url('reset-password?token=' . $resetToken);
         
         $subject = 'Yeu cau dat lai mat khau';
         
@@ -196,4 +150,3 @@ class Mailer {
         return $this->send($email, $subject, $body, $fullName);
     }
 }
-?> -->
