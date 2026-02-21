@@ -254,10 +254,7 @@
                         <tr>
                             <td class="text-muted">Ngày tạo</td>
                             <td>
-                                <?php 
-                                    echo Helper::formatDate($currentUser['created_at'], 'd/m/Y');
-                                    //var_dump($currentUser);
-                                ?>
+                                <?php echo Helper::formatDate($currentUser['created_at'] ?? '', 'd/m/Y'); ?>
                             </td>
                         </tr>
                     </table>
