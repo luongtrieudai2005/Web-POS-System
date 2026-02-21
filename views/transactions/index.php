@@ -1,4 +1,3 @@
-<DOCUMENT filename="index.php">
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -24,16 +23,10 @@
         .qty-btn:hover { background: #667eea; color: #fff; border-color: #667eea; }
         .qty-input { width: 50px; text-align: center; border: 1px solid #dee2e6; border-radius: 6px; padding: 3px; }
 
-        .product-search-result { border: 1px solid #e0e0e0; border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
-        .search-item { padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
-        .search-item:last-child { border-bottom: none; }
-        .search-item:hover { background: #f0f2f5; }
-
         .total-amount { font-size: 26px; font-weight: 700; color: #28a745; }
         .change-amount { font-size: 20px; font-weight: 600; color: #667eea; }
 
         .empty-cart { text-align: center; padding: 40px 20px; color: #aaa; }
-
         .section-card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
 
         #searchDropdown { position: absolute; z-index: 1000; background: #fff; border: 1px solid #ddd; border-radius: 10px; width: 100%; max-height: 280px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; }
@@ -46,7 +39,6 @@
 <?php $activePage = 'pos'; require_once __DIR__ . '/../layouts/navbar.php'; ?>
 
 <div class="pos-layout">
-    <!-- Bên trái: Tìm kiếm + Thông tin khách -->
     <div class="pos-left">
         <?php if (Session::hasFlash('success')): $f = Session::getFlash('success'); ?>
             <div class="alert alert-<?php echo $f['type']; ?> alert-dismissible fade show flash-message">
@@ -55,7 +47,6 @@
             </div>
         <?php endif; ?>
 
-        <!-- Tìm kiếm sản phẩm -->
         <div class="section-card">
             <h6 class="fw-bold mb-3">Tìm kiếm sản phẩm</h6>
             <div class="search-wrapper mb-3">
@@ -68,7 +59,6 @@
             </div>
         </div>
 
-        <!-- Thông tin khách hàng -->
         <div class="section-card">
             <h6 class="fw-bold mb-3">Thông tin khách hàng</h6>
             <div class="row g-2">
@@ -94,7 +84,6 @@
             </div>
         </div>
 
-        <!-- Số tiền khách đưa -->
         <div class="section-card">
             <h6 class="fw-bold mb-3">Thanh toán</h6>
             <div class="row g-2 align-items-end">
@@ -114,7 +103,6 @@
         </div>
     </div>
 
-    <!-- Bên phải: Giỏ hàng -->
     <div class="pos-right">
         <div class="cart-header d-flex justify-content-between align-items-center">
             <h6 class="mb-0 fw-bold">Giỏ hàng</h6>
@@ -123,7 +111,7 @@
 
         <div class="cart-body" id="cartBody">
             <div class="empty-cart" id="emptyCart">
-                <div style="font-size: 40px;">🛒</div>
+                <div style="font-size:40px;">🛒</div>
                 <p class="mt-2">Giỏ hàng trống<br><small>Tìm sản phẩm để thêm vào</small></p>
             </div>
         </div>
@@ -156,6 +144,7 @@
             <div class="modal-body" id="invoiceContent"></div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetAfterCheckout()">Giao dịch mới</button>
+                <a id="btnExportPdf" href="#" target="_blank" class="btn btn-danger">Xuất PDF</a>
                 <button class="btn btn-primary-grad" onclick="printInvoice()">In hóa đơn</button>
             </div>
         </div>
@@ -167,12 +156,13 @@
 const BASE_URL = '<?php echo Router::url(''); ?>';
 let cart = {};
 let searchTimeout = null;
+let lastOrderId = null;
 
 function formatMoney(n) {
     return new Intl.NumberFormat('vi-VN').format(n) + ' ₫';
 }
 
-// ---------- TÌM KIẾM ----------
+// Tìm kiếm sản phẩm
 document.getElementById('searchInput').addEventListener('input', function() {
     clearTimeout(searchTimeout);
     const kw = this.value.trim();
@@ -190,15 +180,14 @@ function searchProducts(kw) {
         .then(data => {
             const dd = document.getElementById('searchDropdown');
             if (!data.length) { dd.style.display = 'none'; return; }
-            dd.innerHTML = data.map(p => `
-                <div class="drop-item" onclick="addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})">
-                    <div>
-                        <strong>${p.name}</strong><br>
-                        <small class="text-muted">${p.barcode} | Tồn: ${p.stock_quantity}</small>
-                    </div>
-                    <span class="text-success fw-bold">${formatMoney(p.retail_price)}</span>
-                </div>
-            `).join('');
+            dd.innerHTML = data.map(p => {
+                const encoded = encodeURIComponent(JSON.stringify(p));
+                return '<div class="drop-item" onclick=\'addToCart(' + JSON.stringify(p).replace(/'/g, '&#39;') + ')\'>'
+                    + '<div><strong>' + p.name + '</strong><br>'
+                    + '<small class="text-muted">' + p.barcode + ' | Tồn: ' + p.stock_quantity + '</small></div>'
+                    + '<span class="text-success fw-bold">' + formatMoney(p.retail_price) + '</span>'
+                    + '</div>';
+            }).join('');
             dd.style.display = 'block';
         });
 }
@@ -219,7 +208,6 @@ document.getElementById('barcodeInput').addEventListener('keydown', function(e) 
     if (e.key === 'Enter') lookupBarcode();
 });
 
-// ---------- GIỎ HÀNG ----------
 function addToCart(product) {
     const id = product.id;
     if (cart[id]) {
@@ -229,7 +217,7 @@ function addToCart(product) {
         }
         cart[id].qty++;
     } else {
-        cart[id] = { ...product, qty: 1 };
+        cart[id] = Object.assign({}, product, { qty: 1 });
     }
     renderCart();
     document.getElementById('searchInput').value = '';
@@ -260,11 +248,10 @@ function clearCart() {
 
 function renderCart() {
     const body = document.getElementById('cartBody');
-    const empty = document.getElementById('emptyCart');
     const items = Object.values(cart);
 
     if (!items.length) {
-        body.innerHTML = '<div class="empty-cart" id="emptyCart"><div style="font-size:40px;">🛒</div><p class="mt-2">Giỏ hàng trống<br><small>Tìm sản phẩm để thêm vào</small></p></div>';
+        body.innerHTML = '<div class="empty-cart"><div style="font-size:40px;">🛒</div><p class="mt-2">Giỏ hàng trống<br><small>Tìm sản phẩm để thêm vào</small></p></div>';
         document.getElementById('cartCount').textContent = '0 sản phẩm';
         document.getElementById('totalAmount').textContent = '0 ₫';
         document.getElementById('displayTotal').textContent = '0 ₫';
@@ -274,32 +261,28 @@ function renderCart() {
 
     let total = 0;
     let html = '';
-    items.forEach(item => {
+    items.forEach(function(item) {
         const sub = item.retail_price * item.qty;
         total += sub;
-        html += `
-        <div class="cart-item">
-            <div class="d-flex justify-content-between align-items-start mb-1">
-                <strong style="font-size:13px;flex:1;">${item.name}</strong>
-                <button class="btn btn-sm text-danger p-0 ms-2" onclick="removeFromCart(${item.id})">✕</button>
-            </div>
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="qty-control">
-                    <button class="qty-btn" onclick="updateQty(${item.id}, ${item.qty - 1})">-</button>
-                    <input class="qty-input" type="number" value="${item.qty}" min="1" max="${item.stock_quantity}"
-                           onchange="updateQty(${item.id}, this.value)">
-                    <button class="qty-btn" onclick="updateQty(${item.id}, ${item.qty + 1})">+</button>
-                </div>
-                <div class="text-end">
-                    <div class="text-muted small">${formatMoney(item.retail_price)} x ${item.qty}</div>
-                    <div class="fw-bold text-success">${formatMoney(sub)}</div>
-                </div>
-            </div>
-        </div>`;
+        html += '<div class="cart-item">'
+            + '<div class="d-flex justify-content-between align-items-start mb-1">'
+            + '<strong style="font-size:13px;flex:1;">' + item.name + '</strong>'
+            + '<button class="btn btn-sm text-danger p-0 ms-2" onclick="removeFromCart(' + item.id + ')">✕</button>'
+            + '</div>'
+            + '<div class="d-flex justify-content-between align-items-center">'
+            + '<div class="qty-control">'
+            + '<button class="qty-btn" onclick="updateQty(' + item.id + ',' + (item.qty - 1) + ')">-</button>'
+            + '<input class="qty-input" type="number" value="' + item.qty + '" min="1" max="' + item.stock_quantity + '" onchange="updateQty(' + item.id + ',this.value)">'
+            + '<button class="qty-btn" onclick="updateQty(' + item.id + ',' + (item.qty + 1) + ')">+</button>'
+            + '</div>'
+            + '<div class="text-end">'
+            + '<div class="text-muted small">' + formatMoney(item.retail_price) + ' × ' + item.qty + '</div>'
+            + '<div class="fw-bold text-success">' + formatMoney(sub) + '</div>'
+            + '</div></div></div>';
     });
 
     body.innerHTML = html;
-    const totalItems = items.reduce((s, i) => s + i.qty, 0);
+    const totalItems = items.reduce(function(s, i) { return s + i.qty; }, 0);
     document.getElementById('cartCount').textContent = totalItems + ' sản phẩm';
     document.getElementById('totalAmount').textContent = formatMoney(total);
     document.getElementById('displayTotal').textContent = formatMoney(total);
@@ -308,14 +291,14 @@ function renderCart() {
 
 function calcChange() {
     const items = Object.values(cart);
-    const total = items.reduce((s, i) => s + i.retail_price * i.qty, 0);
+    const total = items.reduce(function(s, i) { return s + i.retail_price * i.qty; }, 0);
     const paid = parseFloat(document.getElementById('amountPaid').value) || 0;
     const change = paid - total;
-    document.getElementById('displayChange').textContent = formatMoney(change >= 0 ? change : 0);
-    document.getElementById('changeAmount').textContent = formatMoney(change >= 0 ? change : 0);
+    const display = formatMoney(change >= 0 ? change : 0);
+    document.getElementById('displayChange').textContent = display;
+    document.getElementById('changeAmount').textContent = display;
 }
 
-// ---------- TRA CỨU KHÁCH HÀNG ----------
 function lookupCustomer() {
     const phone = document.getElementById('customerPhone').value.trim();
     if (!phone) return;
@@ -336,7 +319,6 @@ function lookupCustomer() {
         });
 }
 
-// ---------- THANH TOÁN ----------
 function processCheckout() {
     const items = Object.values(cart);
     if (!items.length) { alert('Giỏ hàng trống!'); return; }
@@ -345,14 +327,16 @@ function processCheckout() {
     const name = document.getElementById('customerName').value.trim();
     const address = document.getElementById('customerAddress').value.trim();
     const paid = parseFloat(document.getElementById('amountPaid').value) || 0;
-    const total = items.reduce((s, i) => s + i.retail_price * i.qty, 0);
+    const total = items.reduce(function(s, i) { return s + i.retail_price * i.qty; }, 0);
 
     if (!phone || !name) { alert('Vui lòng nhập số điện thoại và họ tên khách hàng!'); return; }
     if (paid < total) { alert('Số tiền khách đưa chưa đủ!'); return; }
 
     const payload = {
-        items: items.map(i => ({ product_id: i.id, quantity: i.qty })),
-        phone, customer_name: name, customer_address: address,
+        items: items.map(function(i) { return { product_id: i.id, quantity: i.qty }; }),
+        phone: phone,
+        customer_name: name,
+        customer_address: address,
         amount_paid: paid
     };
 
@@ -361,83 +345,83 @@ function processCheckout() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
-    .then(r => r.json())
-    .then(data => {
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
         if (data.error) { alert(data.error); return; }
         showInvoice(data);
     })
-    .catch(() => alert('Lỗi kết nối, vui lòng thử lại!'));
+    .catch(function() { alert('Lỗi kết nối, vui lòng thử lại!'); });
 }
 
 function showInvoice(data) {
     const o = data.order;
     const details = data.details;
-    let rows = details.map(d => `
-        <tr>
-            <td>${d.product_name}</td>
-            <td class="text-center">${d.quantity}</td>
-            <td class="text-end">${formatMoney(d.unit_price)}</td>
-            <td class="text-end fw-bold">${formatMoney(d.subtotal)}</td>
-        </tr>
-    `).join('');
+    lastOrderId = data.order_id;
 
-    document.getElementById('invoiceContent').innerHTML = `
-        <div style="font-family:monospace;">
-            <div class="text-center mb-3">
-                <h5 class="fw-bold"><?php echo APP_NAME; ?></h5>
-                <div class="text-muted small">HÓA ĐƠN BÁN HÀNG</div>
-                <div class="small">Mã đơn: <strong>${o.order_code}</strong></div>
-                <div class="small">${new Date(o.created_at).toLocaleString('vi-VN')}</div>
-            </div>
-            <hr>
-            <div class="row mb-2">
-                <div class="col-6"><strong>Khách hàng:</strong><br>${o.customer_name}</div>
-                <div class="col-6"><strong>SĐT:</strong><br>${o.customer_phone}</div>
-            </div>
-            <div class="mb-2"><strong>Nhân viên:</strong> ${o.employee_name}</div>
-            <hr>
-            <table class="table table-sm">
-                <thead><tr><th>Sản phẩm</th><th class="text-center">SL</th><th class="text-end">Đơn giá</th><th class="text-end">Thành tiền</th></tr></thead>
-                <tbody>${rows}</tbody>
-            </table>
-            <hr>
-            <div class="row">
-                <div class="col-6 fw-bold">Tổng tiền:</div>
-                <div class="col-6 text-end fw-bold text-success">${formatMoney(o.total_amount)}</div>
-            </div>
-            <div class="row">
-                <div class="col-6">Khách đưa:</div>
-                <div class="col-6 text-end">${formatMoney(o.amount_paid)}</div>
-            </div>
-            <div class="row">
-                <div class="col-6">Tiền thừa:</div>
-                <div class="col-6 text-end text-primary fw-bold">${formatMoney(o.change_amount)}</div>
-            </div>
-            <hr>
-            <div class="text-center text-muted small">Cảm ơn quý khách! Hẹn gặp lại.</div>
-        </div>
-    `;
+    // Cập nhật link xuất PDF
+    document.getElementById('btnExportPdf').href = BASE_URL + 'transactions/invoice_pdf.php?id=' + lastOrderId;
+
+    let rows = details.map(function(d) {
+        return '<tr>'
+            + '<td>' + d.product_name + '</td>'
+            + '<td class="text-center">' + d.quantity + '</td>'
+            + '<td class="text-end">' + formatMoney(d.unit_price) + '</td>'
+            + '<td class="text-end fw-bold">' + formatMoney(d.subtotal) + '</td>'
+            + '</tr>';
+    }).join('');
+
+    const createdAt = new Date(o.created_at.replace(' ', 'T')).toLocaleString('vi-VN');
+
+    document.getElementById('invoiceContent').innerHTML =
+        '<div style="font-family:monospace;">'
+        + '<div class="text-center mb-3">'
+        + '<h5 class="fw-bold">' + '<?php echo APP_NAME; ?>' + '</h5>'
+        + '<div class="text-muted small">HÓA ĐƠN BÁN HÀNG</div>'
+        + '<div class="small">Mã đơn: <strong>' + o.order_code + '</strong></div>'
+        + '<div class="small">' + createdAt + '</div>'
+        + '</div><hr>'
+        + '<div class="row mb-2">'
+        + '<div class="col-6"><strong>Khách hàng:</strong><br>' + o.customer_name + '</div>'
+        + '<div class="col-6"><strong>SĐT:</strong><br>' + o.customer_phone + '</div>'
+        + '</div>'
+        + '<div class="mb-2"><strong>Nhân viên:</strong> ' + o.employee_name + '</div><hr>'
+        + '<table class="table table-sm"><thead><tr>'
+        + '<th>Sản phẩm</th><th class="text-center">SL</th>'
+        + '<th class="text-end">Đơn giá</th><th class="text-end">Thành tiền</th>'
+        + '</tr></thead><tbody>' + rows + '</tbody></table><hr>'
+        + '<div class="row"><div class="col-6 fw-bold">Tổng tiền:</div>'
+        + '<div class="col-6 text-end fw-bold text-success">' + formatMoney(o.total_amount) + '</div></div>'
+        + '<div class="row"><div class="col-6">Khách đưa:</div>'
+        + '<div class="col-6 text-end">' + formatMoney(o.amount_paid) + '</div></div>'
+        + '<div class="row"><div class="col-6">Tiền thừa:</div>'
+        + '<div class="col-6 text-end text-primary fw-bold">' + formatMoney(o.change_amount) + '</div></div>'
+        + '<hr><div class="text-center text-muted small">Cảm ơn quý khách! Hẹn gặp lại.</div>'
+        + '</div>';
+
     new bootstrap.Modal(document.getElementById('invoiceModal')).show();
 }
 
 function printInvoice() {
     const content = document.getElementById('invoiceContent').innerHTML;
     const win = window.open('', '_blank');
-    win.document.write('<html><head><title>Hóa đơn</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"></head><body style="padding:20px;">' + content + '</body></html>');
+    win.document.write('<html><head><title>Hóa đơn</title>'
+        + '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">'
+        + '</head><body style="padding:20px;">' + content + '</body></html>');
     win.document.close();
     win.print();
 }
 
 function resetAfterCheckout() {
     cart = {};
+    lastOrderId = null;
     renderCart();
     document.getElementById('customerPhone').value = '';
     document.getElementById('customerName').value = '';
     document.getElementById('customerAddress').value = '';
     document.getElementById('amountPaid').value = '';
     document.getElementById('customerInfo').style.display = 'none';
+    document.getElementById('btnExportPdf').href = '#';
 }
 </script>
 </body>
 </html>
-</DOCUMENT>

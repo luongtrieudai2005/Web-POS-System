@@ -5,6 +5,9 @@ require_once __DIR__ . '/../core/Mailer.php';
 
 class UserController {
     
+    /**
+     * Hiển thị danh sách nhân viên
+     */
     public static function index() {
         Auth::requireAdmin();
         
@@ -22,6 +25,9 @@ class UserController {
         require_once __DIR__ . '/../views/users/index.php';
     }
     
+    /**
+     * Thêm nhân viên mới
+     */
     public static function create() {
         Auth::requireAdmin();
         
@@ -47,7 +53,7 @@ class UserController {
                 $errors = $validator->errors();
             } else {
                 if (User::emailExists($formData['email'])) {
-                    $errors['email'] = ['Email da ton tai trong he thong'];
+                    $errors['email'] = ['Email đã tồn tại trong hệ thống'];
                 }
             }
             
@@ -75,18 +81,18 @@ class UserController {
                             );
                             
                             if ($emailSent) {
-                                Session::setFlash('success', 'Tao nhan vien thanh cong! Email da duoc gui den ' . $formData['email'], 'success');
+                                Session::setFlash('success', 'Tạo nhân viên thành công! Email đã được gửi đến ' . $formData['email'], 'success');
                             } else {
-                                Session::setFlash('success', 'Tao nhan vien thanh cong! Nhung khong gui duoc email. Vui long kiem tra cau hinh SMTP.', 'warning');
+                                Session::setFlash('success', 'Tạo nhân viên thành công! Nhưng không gửi được email. Vui lòng kiểm tra cấu hình SMTP.', 'warning');
                             }
                         } catch (Exception $e) {
-                            Session::setFlash('success', 'Tao nhan vien thanh cong! Loi gui email: ' . $e->getMessage(), 'warning');
+                            Session::setFlash('success', 'Tạo nhân viên thành công! Lỗi gửi email: ' . $e->getMessage(), 'warning');
                         }
                         
                         Router::redirect(Router::url('users/index.php'));
                         exit;
                     } else {
-                        $errors['general'] = 'Co loi xay ra khi tao nhan vien';
+                        $errors['general'] = 'Có lỗi xảy ra khi tạo nhân viên';
                     }
                 } catch (Exception $e) {
                     $errors['general'] = $e->getMessage();
@@ -97,13 +103,16 @@ class UserController {
         require_once __DIR__ . '/../views/users/create.php';
     }
     
+    /**
+     * Xem chi tiết nhân viên
+     */
     public static function detail($id) {
         Auth::requireAdmin();
         
         $user = User::getById($id);
         
         if (!$user) {
-            Session::setFlash('error', 'Khong tim thay nhan vien', 'danger');
+            Session::setFlash('error', 'Không tìm thấy nhân viên', 'danger');
             Router::redirect(Router::url('users/index.php'));
             exit;
         }
@@ -111,19 +120,22 @@ class UserController {
         require_once __DIR__ . '/../views/users/detail.php';
     }
     
+    /**
+     * Sửa thông tin nhân viên
+     */
     public static function edit($id) {
         Auth::requireAdmin();
         
         $user = User::getById($id);
         
         if (!$user) {
-            Session::setFlash('error', 'Khong tim thay nhan vien', 'danger');
+            Session::setFlash('error', 'Không tìm thấy nhân viên', 'danger');
             Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
         if ($user['id'] == 1 && Auth::id() != 1) {
-            Session::setFlash('error', 'Ban khong the chinh sua tai khoan admin chinh', 'danger');
+            Session::setFlash('error', 'Bạn không thể chỉnh sửa tài khoản admin chính', 'danger');
             Router::redirect(Router::url('users/index.php'));
             exit;
         }
@@ -151,7 +163,7 @@ class UserController {
                 $errors = $validator->errors();
             } else {
                 if (User::emailExists($formData['email'], $id)) {
-                    $errors['email'] = ['Email da ton tai trong he thong'];
+                    $errors['email'] = ['Email đã tồn tại trong hệ thống'];
                 }
             }
             
@@ -160,11 +172,11 @@ class UserController {
                     $result = User::update($id, $formData);
                     
                     if ($result) {
-                        Session::setFlash('success', 'Cap nhat thong tin thanh cong', 'success');
+                        Session::setFlash('success', 'Cập nhật thông tin thành công', 'success');
                         Router::redirect(Router::url('users/detail.php?id=' . $id));
                         exit;
                     } else {
-                        $errors['general'] = 'Co loi xay ra khi cap nhat';
+                        $errors['general'] = 'Có lỗi xảy ra khi cập nhật';
                     }
                 } catch (Exception $e) {
                     $errors['general'] = $e->getMessage();
@@ -175,19 +187,22 @@ class UserController {
         require_once __DIR__ . '/../views/users/edit.php';
     }
     
+    /**
+     * Gửi lại email kích hoạt cho nhân viên
+     */
     public static function resendEmail($id) {
         Auth::requireAdmin();
         
         $user = User::getById($id);
         
         if (!$user) {
-            Session::setFlash('error', 'Khong tim thay nhan vien', 'danger');
+            Session::setFlash('error', 'Không tìm thấy nhân viên', 'danger');
             Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
         if ($user['is_first_login'] != 1) {
-            Session::setFlash('error', 'Nhan vien da dang nhap roi', 'warning');
+            Session::setFlash('error', 'Nhân viên đã đăng nhập rồi', 'warning');
             Router::redirect(Router::url('users/detail.php?id=' . $id));
             exit;
         }
@@ -203,18 +218,21 @@ class UserController {
             );
             
             if ($emailSent) {
-                Session::setFlash('success', 'Email da duoc gui lai den ' . $user['email'], 'success');
+                Session::setFlash('success', 'Email đã được gửi lại đến ' . $user['email'], 'success');
             } else {
-                Session::setFlash('error', 'Khong the gui email. Vui long kiem tra cau hinh SMTP.', 'danger');
+                Session::setFlash('error', 'Không thể gửi email. Vui lòng kiểm tra cấu hình SMTP.', 'danger');
             }
         } catch (Exception $e) {
-            Session::setFlash('error', 'Loi: ' . $e->getMessage(), 'danger');
+            Session::setFlash('error', 'Lỗi: ' . $e->getMessage(), 'danger');
         }
         
         Router::redirect(Router::url('users/detail.php?id=' . $id));
         exit;
     }
     
+    /**
+     * Thay đổi trạng thái nhân viên (active/inactive/locked)
+     */
     public static function changeStatus($id) {
         Auth::requireAdmin();
         
@@ -232,7 +250,7 @@ class UserController {
         }
         
         if ($user['id'] == 1) {
-            Session::setFlash('error', 'Khong the thay doi trang thai admin chinh', 'danger');
+            Session::setFlash('error', 'Không thể thay đổi trạng thái admin chính', 'danger');
             Router::redirect(Router::url('users/index.php'));
             exit;
         }
@@ -249,7 +267,7 @@ class UserController {
             $result = User::changeStatus($id, $status);
             
             if ($result) {
-                Session::setFlash('success', 'Thay doi trang thai thanh cong', 'success');
+                Session::setFlash('success', 'Thay đổi trạng thái thành công', 'success');
             } else {
                 Session::setFlash('error', 'Có lỗi xảy ra', 'danger');
             }
@@ -261,6 +279,9 @@ class UserController {
         exit;
     }
     
+    /**
+     * Xóa nhân viên
+     */
     public static function delete($id) {
         Auth::requireAdmin();
         

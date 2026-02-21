@@ -1,7 +1,7 @@
 <?php
 /**
- * Authentication Class
- * Xu ly xac thuc va phan quyen
+ * Lớp Xác thực
+ * Xử lý đăng nhập, đăng xuất và phân quyền người dùng
  */
 
 class Auth {
@@ -9,7 +9,7 @@ class Auth {
     private static $db;
     
     /**
-     * Khoi tao
+     * Khởi tạo kết nối database
      */
     private static function init() {
         if (!self::$db) {
@@ -18,14 +18,14 @@ class Auth {
     }
     
     /**
-     * Dang nhap bang username va password
+     * Đăng nhập bằng tên đăng nhập và mật khẩu
      * 
-     * @return array|false Thong tin user hoac false neu that bai
+     * @return array|false Thông tin người dùng hoặc false nếu thất bại
      */
     public static function login($username, $password) {
         self::init();
         
-        // Tim user theo username
+        // Tìm người dùng theo tên đăng nhập
         $user = self::$db->fetchOne(
             "SELECT * FROM users WHERE username = ? LIMIT 1",
             [$username]
@@ -35,17 +35,17 @@ class Auth {
             return false;
         }
         
-        // Kiem tra account bi khoa
+        // Kiểm tra tài khoản bị khóa
         if ($user['status'] === 'locked') {
-            throw new Exception('Tai khoan da bi khoa. Vui long lien he quan tri vien.');
+            throw new Exception('Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.');
         }
         
-        // Kiem tra password
+        // Kiểm tra mật khẩu
         if (!password_verify($password, $user['password'])) {
             return false;
         }
         
-        // Luu thong tin vao session
+        // Lưu thông tin vào session
         Session::setUser($user);
         Session::regenerate();
         
@@ -53,7 +53,7 @@ class Auth {
     }
     
     /**
-     * Dang nhap bang token (cho nhan vien moi)
+     * Đăng nhập bằng token (dành cho nhân viên mới lần đầu)
      * 
      * @return array|false
      */
@@ -61,7 +61,7 @@ class Auth {
         self::init();
         
         try {
-            // Tim user co token hop le
+            // Tìm người dùng có token hợp lệ
             $user = self::$db->fetchOne(
                 "SELECT * FROM users 
                  WHERE login_token = ? 
@@ -75,16 +75,16 @@ class Auth {
                 return false;
             }
             
-            // Kiem tra account bi khoa
+            // Kiểm tra tài khoản bị khóa
             if ($user['status'] === 'locked') {
-                throw new Exception('Tai khoan da bi khoa.');
+                throw new Exception('Tài khoản đã bị khóa.');
             }
             
-            // Luu thong tin vao session
+            // Lưu thông tin vào session
             Session::setUser($user);
             Session::regenerate();
             
-            // Xoa token da su dung
+            // Xóa token đã sử dụng
             self::$db->execute(
                 "UPDATE users SET login_token = NULL, token_expiry = NULL WHERE id = ?",
                 [$user['id']]
@@ -98,74 +98,74 @@ class Auth {
     }
     
     /**
-     * Dang xuat
+     * Đăng xuất
      */
     public static function logout() {
         Session::destroy();
     }
     
     /**
-     * Kiem tra da dang nhap chua
+     * Kiểm tra người dùng đã đăng nhập chưa
      */
     public static function check() {
         return Session::isLoggedIn();
     }
     
     /**
-     * Lay thong tin user hien tai
+     * Lấy thông tin người dùng hiện tại
      */
     public static function user() {
         return Session::getUser();
     }
     
     /**
-     * Lay ID user hien tai
+     * Lấy ID người dùng hiện tại
      */
     public static function id() {
         return Session::getUserId();
     }
     
     /**
-     * Kiem tra co phai admin khong
+     * Kiểm tra người dùng có phải admin không
      */
     public static function isAdmin() {
         return Session::isAdmin();
     }
     
     /**
-     * Kiem tra co phai salesperson khong
+     * Kiểm tra người dùng có phải nhân viên bán hàng không
      */
     public static function isSalesperson() {
         return Session::isSalesperson();
     }
     
     /**
-     * Yeu cau phai dang nhap
-     * Neu chua dang nhap thi redirect ve trang login
+     * Yêu cầu phải đăng nhập
+     * Nếu chưa đăng nhập thì chuyển hướng về trang đăng nhập
      */
     public static function requireLogin() {
         if (!self::check()) {
-            Session::setFlash('error', 'Vui long dang nhap de tiep tuc', 'warning');
+            Session::setFlash('error', 'Vui lòng đăng nhập để tiếp tục', 'warning');
             Router::redirect(Router::url('login'));
             exit;
         }
     }
     
     /**
-     * Yeu cau phai la admin
+     * Yêu cầu phải là admin
      */
     public static function requireAdmin() {
         self::requireLogin();
         
         if (!self::isAdmin()) {
-            Session::setFlash('error', 'Ban khong co quyen truy cap', 'danger');
+            Session::setFlash('error', 'Bạn không có quyền truy cập trang này', 'danger');
             Router::redirect(Router::url('index.php'));
             exit;
         }
     }
     
     /**
-     * Yeu cau phai doi mat khau (cho first login)
+     * Yêu cầu đổi mật khẩu (dành cho lần đăng nhập đầu tiên)
      */
     public static function requirePasswordChange() {
         if (!self::check()) {
@@ -177,20 +177,20 @@ class Auth {
     }
     
     /**
-     * Tao login token cho nhan vien moi
+     * Tạo token đăng nhập cho nhân viên mới
      * 
      * @return string Token
      */
     public static function generateLoginToken($userId) {
         self::init();
         
-        // Tao token ngau nhien
+        // Tạo token ngẫu nhiên
         $token = bin2hex(random_bytes(32));
         
-        // Tinh thoi gian het han (1 phut)
+        // Tính thời gian hết hạn
         $expiry = date('Y-m-d H:i:s', strtotime('+' . TOKEN_EXPIRY_MINUTES . ' minutes'));
         
-        // Luu vao database
+        // Lưu vào cơ sở dữ liệu
         self::$db->execute(
             "UPDATE users 
              SET login_token = ?, token_expiry = ?
@@ -202,15 +202,15 @@ class Auth {
     }
     
     /**
-     * Doi mat khau
+     * Đổi mật khẩu
      */
     public static function changePassword($userId, $newPassword) {
         self::init();
         
-        // Hash password
+        // Mã hóa mật khẩu mới
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
         
-        // Cap nhat database
+        // Cập nhật cơ sở dữ liệu
         $result = self::$db->execute(
             "UPDATE users 
              SET password = ?, 
@@ -220,7 +220,7 @@ class Auth {
             [$hashedPassword, $userId]
         );
         
-        // Cap nhat session
+        // Cập nhật session nếu người dùng đang đăng nhập
         if ($result && Session::getUserId() == $userId) {
             $user = Session::getUser();
             $user['is_first_login'] = 0;
@@ -231,7 +231,7 @@ class Auth {
     }
     
     /**
-     * Kiem tra password co dung khong
+     * Kiểm tra mật khẩu có đúng không
      */
     public static function verifyPassword($userId, $password) {
         self::init();
@@ -249,7 +249,7 @@ class Auth {
     }
     
     /**
-     * Hash password
+     * Mã hóa mật khẩu
      */
     public static function hashPassword($password) {
         return password_hash($password, PASSWORD_DEFAULT);

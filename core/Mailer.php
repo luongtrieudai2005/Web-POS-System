@@ -35,7 +35,7 @@ class Mailer {
             }
             
         } catch (Exception $e) {
-            throw new Exception("Khong the cau hinh email: " . $e->getMessage());
+            throw new Exception("Không thể cấu hình email: " . $e->getMessage());
         }
     }
     
@@ -56,71 +56,87 @@ class Mailer {
             
         } catch (Exception $e) {
             if (APP_DEBUG) {
-                echo "Email Error: {$this->mailer->ErrorInfo}";
+                echo "Lỗi gửi email: {$this->mailer->ErrorInfo}";
             }
             return false;
         }
     }
     
+    /**
+     * Gửi email thông báo tài khoản nhân viên mới được tạo
+     */
     public function sendEmployeeRegistration($email, $fullName, $token) {
         $loginUrl = Router::url('login?token=' . $token);
         
-        $subject = 'Tai khoan cua ban da duoc tao';
+        $subject = 'Thông tin tài khoản của bạn đã được tạo';
         
         $body = $this->getEmployeeRegistrationTemplate($fullName, $loginUrl);
         
         return $this->send($email, $subject, $body, $fullName);
     }
     
+    /**
+     * Template email đẹp hơn cho nhân viên mới
+     */
     private function getEmployeeRegistrationTemplate($fullName, $loginUrl) {
         return '
         <!DOCTYPE html>
-        <html>
+        <html lang="vi">
         <head>
             <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Chào mừng đến với ' . APP_NAME . '</title>
             <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #007bff; color: white; padding: 20px; text-align: center; }
-                .content { padding: 20px; background: #f8f9fa; }
-                .button { display: inline-block; padding: 12px 30px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-                .footer { padding: 20px; text-align: center; font-size: 12px; color: #666; }
-                .warning { background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 15px 0; }
+                body { margin: 0; padding: 0; font-family: "Helvetica Neue", Arial, sans-serif; background: #f4f4f9; color: #333; line-height: 1.6; }
+                .container { max-width: 600px; margin: 30px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center; }
+                .header h1 { margin: 0; font-size: 28px; }
+                .content { padding: 40px 30px; background: #ffffff; }
+                .greeting { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+                .button { display: inline-block; padding: 14px 36px; background: #28a745; color: white !important; text-decoration: none; border-radius: 50px; font-size: 16px; font-weight: 600; margin: 25px 0; transition: all 0.3s; }
+                .button:hover { background: #218838; transform: translateY(-2px); }
+                .warning { background: #fff8e1; border-left: 5px solid #ffc107; padding: 20px; margin: 25px 0; border-radius: 6px; }
+                .link { color: #667eea; text-decoration: underline; word-break: break-all; }
+                .footer { background: #f8f9fa; padding: 25px 30px; text-align: center; font-size: 13px; color: #666; border-top: 1px solid #eee; }
+                @media only screen and (max-width: 600px) {
+                    .container { margin: 15px; }
+                    .content, .header { padding: 30px 20px; }
+                }
             </style>
         </head>
         <body>
             <div class="container">
                 <div class="header">
-                    <h1>Chao mung den voi ' . APP_NAME . '</h1>
+                    <h1>Chào mừng bạn đến với ' . APP_NAME . '</h1>
                 </div>
                 
                 <div class="content">
-                    <p>Xin chao <strong>' . htmlspecialchars($fullName) . '</strong>,</p>
+                    <div class="greeting">Xin chào ' . htmlspecialchars($fullName) . ',</div>
                     
-                    <p>Tai khoan cua ban da duoc tao thanh cong trong he thong ' . APP_NAME . '.</p>
+                    <p>Tài khoản của bạn đã được tạo thành công trong hệ thống quản lý bán hàng ' . APP_NAME . '.</p>
                     
-                    <p>De dang nhap lan dau tien, vui long click vao nut ben duoi:</p>
+                    <p>Để đăng nhập lần đầu tiên và bắt đầu sử dụng, vui lòng nhấn vào nút bên dưới:</p>
                     
                     <p style="text-align: center;">
-                        <a href="' . htmlspecialchars($loginUrl) . '" class="button">Dang nhap ngay</a>
+                        <a href="' . htmlspecialchars($loginUrl) . '" class="button">Đăng nhập ngay</a>
                     </p>
                     
                     <div class="warning">
-                        <strong>Luu y quan trong:</strong>
-                        <ul>
-                            <li>Lien ket nay chi co hieu luc trong <strong>' . TOKEN_EXPIRY_MINUTES . ' phut</strong></li>
-                            <li>Sau khi het han, vui long lien he quan tri vien de gui lai email</li>
-                            <li>Sau khi dang nhap, ban bat buoc phai doi mat khau</li>
+                        <strong>Lưu ý quan trọng:</strong>
+                        <ul style="margin: 10px 0 0 20px; padding-left: 0;">
+                            <li>Liên kết này chỉ có hiệu lực trong <strong>' . TOKEN_EXPIRY_MINUTES . ' phút</strong></li>
+                            <li>Sau khi hết hạn, vui lòng liên hệ quản trị viên để được gửi lại email</li>
+                            <li>Sau khi đăng nhập lần đầu, bạn <strong>bắt buộc phải đổi mật khẩu</strong> để bảo mật tài khoản</li>
                         </ul>
                     </div>
                     
-                    <p>Neu nut khong hoat dong, hay copy link sau vao trinh duyet:</p>
-                    <p style="word-break: break-all; color: #007bff;">' . htmlspecialchars($loginUrl) . '</p>
+                    <p>Nếu nút trên không hoạt động, bạn có thể sao chép và dán đường dẫn sau vào trình duyệt:</p>
+                    <p class="link">' . htmlspecialchars($loginUrl) . '</p>
                 </div>
                 
                 <div class="footer">
-                    <p>Email nay duoc gui tu dong, vui long khong tra loi.</p>
-                    <p>&copy; ' . date('Y') . ' ' . APP_NAME . '. All rights reserved.</p>
+                    <p>Email này được gửi tự động, vui lòng không trả lời trực tiếp.</p>
+                    <p>© ' . date('Y') . ' ' . APP_NAME . ' - Hệ thống quản lý bán hàng</p>
                 </div>
             </div>
         </body>
@@ -128,21 +144,60 @@ class Mailer {
         ';
     }
     
+    /**
+     * Gửi email yêu cầu đặt lại mật khẩu
+     */
     public function sendPasswordReset($email, $fullName, $resetToken) {
         $resetUrl = Router::url('reset-password?token=' . $resetToken);
         
-        $subject = 'Yeu cau dat lai mat khau';
+        $subject = 'Yêu cầu đặt lại mật khẩu';
         
         $body = '
         <!DOCTYPE html>
-        <html>
-        <head><meta charset="UTF-8"></head>
+        <html lang="vi">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Đặt lại mật khẩu</title>
+            <style>
+                body { margin: 0; padding: 0; font-family: "Helvetica Neue", Arial, sans-serif; background: #f4f4f9; color: #333; line-height: 1.6; }
+                .container { max-width: 600px; margin: 30px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                .header { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 40px 30px; text-align: center; }
+                .header h1 { margin: 0; font-size: 26px; }
+                .content { padding: 40px 30px; }
+                .greeting { font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+                .button { display: inline-block; padding: 14px 36px; background: #dc3545; color: white !important; text-decoration: none; border-radius: 50px; font-size: 16px; font-weight: 600; margin: 25px 0; }
+                .button:hover { background: #c82333; }
+                .footer { background: #f8f9fa; padding: 25px 30px; text-align: center; font-size: 13px; color: #666; border-top: 1px solid #eee; }
+                .link { color: #dc3545; word-break: break-all; }
+            </style>
+        </head>
         <body>
-            <h2>Xin chao ' . htmlspecialchars($fullName) . '</h2>
-            <p>Chung toi nhan duoc yeu cau dat lai mat khau cho tai khoan cua ban.</p>
-            <p><a href="' . htmlspecialchars($resetUrl) . '">Click vao day de dat lai mat khau</a></p>
-            <p>Lien ket co hieu luc trong 15 phut.</p>
-            <p>Neu ban khong yeu cau dat lai mat khau, vui long bo qua email nay.</p>
+            <div class="container">
+                <div class="header">
+                    <h1>Đặt lại mật khẩu</h1>
+                </div>
+                
+                <div class="content">
+                    <div class="greeting">Xin chào ' . htmlspecialchars($fullName) . ',</div>
+                    
+                    <p>Chúng tôi vừa nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn tại ' . APP_NAME . '.</p>
+                    
+                    <p style="text-align: center;">
+                        <a href="' . htmlspecialchars($resetUrl) . '" class="button">Đặt lại mật khẩu ngay</a>
+                    </p>
+                    
+                    <p>Liên kết này có hiệu lực trong <strong>15 phút</strong>. Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>
+                    
+                    <p>Nếu nút không hoạt động, bạn có thể sao chép đường dẫn sau:</p>
+                    <p class="link">' . htmlspecialchars($resetUrl) . '</p>
+                </div>
+                
+                <div class="footer">
+                    <p>Email này được gửi tự động, vui lòng không trả lời.</p>
+                    <p>© ' . date('Y') . ' ' . APP_NAME . ' - Hệ thống quản lý bán hàng</p>
+                </div>
+            </div>
         </body>
         </html>
         ';
