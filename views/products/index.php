@@ -162,6 +162,14 @@
         </div>
     <?php endif; ?>
 
+    <?php if (Session::hasFlash('error')): ?>
+        <?php $flash = Session::getFlash('error'); ?>
+        <div class="alert alert-<?php echo $flash['type']; ?> alert-dismissible fade show">
+            <?php echo Helper::escape($flash['message']); ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
     <div class="card">
         <div class="card-body">
 
@@ -328,7 +336,11 @@
 <script>
 function deleteProduct(id, name) {
     if (confirm('Bạn có chắc muốn xóa sản phẩm "' + name + '"?\nHành động này không thể hoàn tác.')) {
-        window.location.href = '<?php echo Router::url('products/delete.php?id='); ?>' + id;
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '<?php echo Router::url('products/delete.php?id='); ?>' + id;
+        document.body.appendChild(form);
+        form.submit();
     }
 }
 </script>

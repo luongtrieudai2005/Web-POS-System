@@ -132,20 +132,42 @@ class Order {
     }
 
     // Doanh thu theo ngay (cho bieu do)
-    public static function getRevenueByDay($dateFrom, $dateTo) {
-        self::init();
-        return self::$db->fetchAll(
-            "SELECT DATE(created_at) as date,
-                    SUM(total_amount) as revenue,
-                    COUNT(id) as orders
-             FROM orders
-             WHERE created_at BETWEEN ? AND ?
-             GROUP BY DATE(created_at)
-             ORDER BY date ASC",
-            [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59']
-        );
-    }
+    // public static function getRevenueByDay($dateFrom, $dateTo) {
+    //     self::init();
+    //     return self::$db->fetchAll(
+    //         "SELECT DATE(created_at) as date,
+    //                 SUM(total_amount) as revenue,
+    //                 COUNT(id) as orders
+    //          FROM orders
+    //          WHERE created_at BETWEEN ? AND ?
+    //          GROUP BY DATE(created_at)
+    //          ORDER BY date ASC",
+    //         [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59']
+    //     );
+    // }
+    public static function getRevenueByDay($dateFrom, $dateTo, $employeeId = null) {
+            self::init();
+            $where  = "WHERE created_at BETWEEN ? AND ?";
+            $params = [$dateFrom . ' 00:00:00', $dateTo . ' 23:59:59'];
 
+            if ($employeeId) {
+                $where   .= " AND employee_id = ?";
+                $params[] = $employeeId;
+            }
+
+            return self::$db->fetchAll(
+                "SELECT DATE(created_at) as date,
+                        SUM(total_amount) as revenue,
+                        COUNT(id) as orders
+                 FROM orders
+                 $where
+                 GROUP BY DATE(created_at)
+                 ORDER BY date ASC",
+                $params
+            );
+        }
+
+    
     // Top san pham ban chay
     public static function getTopProducts($dateFrom, $dateTo, $limit = 5) {
         self::init();

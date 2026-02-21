@@ -190,8 +190,10 @@
 <script>
     function deleteCategory(id, name) {
         if (confirm('Bạn có chắc chắn muốn xóa danh mục "' + name + '"?\n\nChỉ có thể xóa danh mục chưa có sản phẩm nào.')) {
-            const form = document.getElementById('deleteForm');
+            const form = document.createElement('form');
+            form.method = 'POST';
             form.action = '<?php echo Router::url('categories/delete.php?id='); ?>' + id;
+            document.body.appendChild(form);
             form.submit();
         }
     }

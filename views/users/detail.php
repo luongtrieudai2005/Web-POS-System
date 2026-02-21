@@ -226,13 +226,19 @@
                 </div>
             </div>
         </div>
-
         <!-- Sidebar hành động -->
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body">
-                    
+
                     <h5 class="mb-3">Hành động</h5>
+
+                    <!-- Nút xem doanh số -->
+                    <a href="<?php echo Router::url('users/sales_report.php?id=' . $user['id']); ?>"
+                       class="btn w-100 mb-2 text-white fw-semibold"
+                       style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                        Xem doanh số bán hàng
+                    </a>
 
                     <?php if ($user['is_first_login'] == 1): ?>
                         <a href="<?php echo Router::url('users/resend-email.php?id=' . $user['id']); ?>"
@@ -246,20 +252,12 @@
                         <form method="POST"
                               action="<?php echo Router::url('users/change-status.php?id=' . $user['id']); ?>"
                               class="mb-2">
-
                             <select name="status" class="form-select mb-2">
-                                <option value="active" <?php echo $user['status'] == 'active' ? 'selected' : ''; ?>>
-                                    Hoạt động
-                                </option>
-                                <option value="inactive" <?php echo $user['status'] == 'inactive' ? 'selected' : ''; ?>>
-                                    Ngừng hoạt động
-                                </option>
-                                <option value="locked" <?php echo $user['status'] == 'locked' ? 'selected' : ''; ?>>
-                                    Khóa
-                                </option>
+                                <option value="active"   <?php echo $user['status'] == 'active'   ? 'selected' : ''; ?>>Hoạt động</option>
+                                <option value="inactive" <?php echo $user['status'] == 'inactive' ? 'selected' : ''; ?>>Ngừng hoạt động</option>
+                                <option value="locked"   <?php echo $user['status'] == 'locked'   ? 'selected' : ''; ?>>Khóa</option>
                             </select>
-
-                            <button type="submit" class="btn btn-info w-100">
+                            <button type="submit" class="btn btn-info w-100 text-white">
                                 Đổi trạng thái
                             </button>
                         </form>
