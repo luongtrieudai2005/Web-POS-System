@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doi mat khau - <?php echo APP_NAME; ?></title>
+    <title>Đổi mật khẩu - <?php echo APP_NAME; ?></title>
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -160,18 +160,18 @@
             <div class="password-card">
                 <!-- Header -->
                 <div class="password-header">
-                    <h2>Tao mat khau moi</h2>
-                    <p>Lan dang nhap dau tien</p>
+                    <h2>Tạo mật khẩu mới</h2>
+                    <p>Lần đăng nhập đầu tiên</p>
                 </div>
                 
                 <!-- Body -->
                 <div class="password-body">
                     <!-- Welcome message -->
                     <div class="welcome-box">
-                        <h5>Chao mung, <?php echo Helper::escape($user['full_name']); ?>!</h5>
+                        <h5>Chào mừng, <?php echo Helper::escape($user['full_name']); ?>!</h5>
                         <p>
-                            Day la lan dau tien ban dang nhap vao he thong. 
-                            Vi ly do bao mat, ban can tao mat khau moi de tiep tuc su dung he thong.
+                            Đây là lần đầu tiên bạn đăng nhập vào hệ thống. 
+                            Vì lý do bảo mật bạn cần phải đổi mật khẩu để tiếp tục sử dụng hệ thống.
                         </p>
                     </div>
                     
@@ -207,13 +207,13 @@
                         
                         <!-- Xac nhan mat khau -->
                         <div class="mb-4">
-                            <label for="confirm_password" class="form-label">Xac nhan mat khau</label>
+                            <label for="confirm_password" class="form-label">Xác nhận mật khẩu</label>
                             <input 
                                 type="password" 
                                 class="form-control <?php echo isset($errors['confirm_password']) ? 'is-invalid' : ''; ?>" 
                                 id="confirm_password" 
                                 name="confirm_password" 
-                                placeholder="Nhap lai mat khau moi"
+                                placeholder="Nhập lại mật khẩu mới"
                                 minlength="<?php echo PASSWORD_MIN_LENGTH; ?>"
                                 required
                             >
@@ -226,22 +226,22 @@
                         
                         <!-- Submit Button -->
                         <button type="submit" class="btn btn-change-password">
-                            Tao mat khau moi
+                            Tạo mật khẩu mới
                         </button>
                         
                         <!-- Logout Button -->
                         <a href="<?php echo Router::url('logout'); ?>" class="btn btn-logout">
-                            Dang xuat
+                            Đăng xuất
                         </a>
                     </form>
                     
                     <!-- Yeu cau mat khau -->
                     <div class="password-requirements">
-                        <h6>Yeu cau mat khau:</h6>
+                        <h6>Yêu cầu mật khẩu:</h6>
                         <ul>
-                            <li>Toi thieu <?php echo PASSWORD_MIN_LENGTH; ?> ky tu</li>
-                            <li>Nen ket hop chu, so va ky tu dac biet</li>
-                            <li>Khong nen su dung mat khau qua don gian</li>
+                            <li>Tối thiểu <?php echo PASSWORD_MIN_LENGTH; ?> ký tự</li>
+                            <li>Nên kết hợp chữ, số và ký tự đặc biệt</li>
+                            <li>Không nên sử dụng mật khẩu quá đơn giản</li>
                         </ul>
                     </div>
                 </div>
@@ -261,14 +261,14 @@
             // Kiem tra mat khau khop nhau
             if (newPassword !== confirmPassword) {
                 e.preventDefault();
-                alert('Mat khau xac nhan khong khop!');
+                alert('Mật khẩu xác nhận khônh khớp!');
                 return false;
             }
             
             // Kiem tra do dai
             if (newPassword.length < <?php echo PASSWORD_MIN_LENGTH; ?>) {
                 e.preventDefault();
-                alert('Mat khau phai co it nhat <?php echo PASSWORD_MIN_LENGTH; ?> ky tu!');
+                alert('Mật khẩu phải có ít nhất <?php echo PASSWORD_MIN_LENGTH; ?> ký tự!');
                 return false;
             }
         });

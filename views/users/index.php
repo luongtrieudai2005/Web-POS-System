@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quan ly nhan vien - <?php echo APP_NAME; ?></title>
+    <title>Quản lý nhân viên - <?php echo APP_NAME; ?></title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -75,25 +75,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="<?php echo Router::url('dashboard'); ?>">
-                <?php echo APP_NAME; ?>
-            </a>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text text-white me-3">
-                    <?php echo Helper::escape(Auth::user()['full_name']); ?>
-                    <span class="badge bg-warning text-dark">Admin</span>
-                </span>
-                <a href="<?php echo Router::url('dashboard'); ?>" class="btn btn-outline-light btn-sm me-2">
-                    Dashboard
-                </a>
-                <a href="<?php echo Router::url('logout'); ?>" class="btn btn-outline-light btn-sm">
-                    Dang xuat
-                </a>
-            </div>
-        </div>
-    </nav>
+    <?php require_once __DIR__ . '/../layouts/navbar.php'; ?>
     
     <div class="container content-wrapper">
         <?php if (Session::hasFlash('success')): ?>
@@ -114,9 +96,9 @@
         
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">Danh sach nhan vien</h4>
+                <h4 class="mb-0">Danh sách nhân viên</h4>
                 <a href="<?php echo Router::url('users/create'); ?>" class="btn btn-add">
-                    + Them nhan vien moi
+                    + Thêm nhân viên mới
                 </a>
             </div>
             
@@ -125,26 +107,26 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <input type="text" name="search" class="form-control" 
-                                   placeholder="Tim kiem theo ten, email..." 
+                                   placeholder="Tìm kiếm theo tên, email..." 
                                    value="<?php echo Helper::escape($search ?? ''); ?>">
                         </div>
                         <div class="col-md-3">
                             <select name="role" class="form-select">
-                                <option value="">Tat ca vai tro</option>
-                                <option value="admin" <?php echo ($role ?? '') == 'admin' ? 'selected' : ''; ?>>Admin</option>
-                                <option value="salesperson" <?php echo ($role ?? '') == 'salesperson' ? 'selected' : ''; ?>>Nhan vien</option>
+                                <option value="">Tất cả vai trò</option>
+                                <option value="admin" <?php echo ($role ?? '') == 'admin' ? 'selected' : ''; ?>>Quản trị viên</option>
+                                <option value="salesperson" <?php echo ($role ?? '') == 'salesperson' ? 'selected' : ''; ?>>Nhân viên</option>
                             </select>
                         </div>
                         <div class="col-md-3">
                             <select name="status" class="form-select">
-                                <option value="">Tat ca trang thai</option>
-                                <option value="active" <?php echo ($status ?? '') == 'active' ? 'selected' : ''; ?>>Hoat dong</option>
-                                <option value="inactive" <?php echo ($status ?? '') == 'inactive' ? 'selected' : ''; ?>>Ngung hoat dong</option>
-                                <option value="locked" <?php echo ($status ?? '') == 'locked' ? 'selected' : ''; ?>>Khoa</option>
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="active" <?php echo ($status ?? '') == 'active' ? 'selected' : ''; ?>>Hoạt động</option>
+                                <option value="inactive" <?php echo ($status ?? '') == 'inactive' ? 'selected' : ''; ?>>Ngừng hoạt động</option>
+                                <option value="locked" <?php echo ($status ?? '') == 'locked' ? 'selected' : ''; ?>>Khóa</option>
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary w-100">Tim kiem</button>
+                            <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
                         </div>
                     </div>
                 </form>
@@ -154,20 +136,20 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Ho ten</th>
+                                <th>Họ tên</th>
                                 <th>Email</th>
-                                <th>Dien thoai</th>
-                                <th>Vai tro</th>
-                                <th>Trang thai</th>
-                                <th>Ngay tao</th>
-                                <th>Hanh dong</th>
+                                <th>Điện thoại</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($users)): ?>
                                 <tr>
                                     <td colspan="8" class="text-center py-4">
-                                        Khong co nhan vien nao
+                                        Không có nhân viên nào
                                     </td>
                                 </tr>
                             <?php else: ?>
@@ -177,25 +159,25 @@
                                         <td>
                                             <strong><?php echo Helper::escape($user['full_name']); ?></strong>
                                             <?php if ($user['is_first_login'] == 1): ?>
-                                                <br><small class="text-warning">Chua dang nhap lan dau</small>
+                                                <br><small class="text-warning">Chưa đăng nhập lần đầu</small>
                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo Helper::escape($user['email']); ?></td>
                                         <td><?php echo Helper::escape($user['phone'] ?? '-'); ?></td>
                                         <td>
                                             <?php if ($user['role'] == 'admin'): ?>
-                                                <span class="badge bg-danger">Admin</span>
+                                                <span class="badge bg-danger">Quản trị viên</span>
                                             <?php else: ?>
-                                                <span class="badge bg-primary">Nhan vien</span>
+                                                <span class="badge bg-primary">Nhân viên</span>
                                             <?php endif; ?>
                                         </td>
                                         <td>
                                             <?php if ($user['status'] == 'active'): ?>
-                                                <span class="badge bg-success">Hoat dong</span>
+                                                <span class="badge bg-success">Hoạt động</span>
                                             <?php elseif ($user['status'] == 'inactive'): ?>
-                                                <span class="badge bg-secondary">Ngung</span>
+                                                <span class="badge bg-secondary">Ngừng</span>
                                             <?php else: ?>
-                                                <span class="badge bg-dark">Khoa</span>
+                                                <span class="badge bg-dark">Khóa</span>
                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo Helper::formatDate($user['created_at'], 'd/m/Y'); ?></td>
@@ -206,7 +188,7 @@
                                             </a>
                                             <a href="<?php echo Router::url('users/edit.php?id=' . $user['id']); ?>" 
                                                class="btn btn-sm btn-warning btn-action">
-                                                Sua
+                                                Sửa
                                             </a>
                                         </td>
                                     </tr>
@@ -218,7 +200,7 @@
                 
                 <div class="mt-3">
                     <p class="text-muted mb-0">
-                        Tong so: <strong><?php echo count($users); ?></strong> nhan vien
+                        Tổng số: <strong><?php echo count($users); ?></strong> nhân viên
                     </p>
                 </div>
             </div>

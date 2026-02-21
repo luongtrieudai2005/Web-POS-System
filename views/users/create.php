@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Them nhan vien - <?php echo APP_NAME; ?></title>
+    <title>Thêm nhân viên - <?php echo APP_NAME; ?></title>
     
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
@@ -64,145 +65,167 @@
         }
     </style>
 </head>
+
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="<?php echo Router::url('dashboard'); ?>">
-                <?php echo APP_NAME; ?>
-            </a>
-            <div class="navbar-nav ms-auto">
-                <span class="navbar-text text-white me-3">
-                    <?php echo Helper::escape(Auth::user()['full_name']); ?>
-                    <span class="badge bg-warning text-dark">Admin</span>
-                </span>
-                <a href="<?php echo Router::url('logout'); ?>" class="btn btn-outline-light btn-sm">
-                    Dang xuat
-                </a>
-            </div>
-        </div>
-    </nav>
-    
-    <div class="container content-wrapper">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="mb-0">Them nhan vien moi</h4>
+
+<?php require_once __DIR__ . '/../layouts/navbar.php'; ?>
+
+<div class="container content-wrapper">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <div class="card">
+                
+                <div class="card-header">
+                    <h4 class="mb-0">Thêm nhân viên mới</h4>
+                </div>
+                
+                <div class="card-body p-4">
+
+                    <div class="info-box">
+                        <h6 class="mb-2">Lưu ý:</h6>
+                        <ul class="mb-0" style="font-size: 14px;">
+                            <li>Email phải là Gmail để nhận được thư đăng nhập</li>
+                            <li>Mật khẩu tạm thời: <strong><?php echo PASSWORD_TEMP; ?></strong></li>
+                            <li>Nhân viên sẽ nhận email với liên kết đăng nhập (hiệu lực <?php echo TOKEN_EXPIRY_MINUTES; ?> phút)</li>
+                            <li>Sau khi đăng nhập, nhân viên bắt buộc phải đổi mật khẩu</li>
+                        </ul>
                     </div>
-                    
-                    <div class="card-body p-4">
-                        <div class="info-box">
-                            <h6 class="mb-2">Luu y:</h6>
-                            <ul class="mb-0" style="font-size: 14px;">
-                                <li>Email phai la Gmail de nhan duoc thu dang nhap</li>
-                                <li>Mat khau tam thoi: <strong><?php echo PASSWORD_TEMP; ?></strong></li>
-                                <li>Nhan vien se nhan email voi lien ket dang nhap (hieu luc <?php echo TOKEN_EXPIRY_MINUTES; ?> phut)</li>
-                                <li>Sau khi dang nhap, nhan vien bat buoc phai doi mat khau</li>
-                            </ul>
+
+                    <?php if (isset($errors['general'])): ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <?php echo Helper::escape($errors['general']); ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
-                        
-                        <?php if (isset($errors['general'])): ?>
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <?php echo Helper::escape($errors['general']); ?>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <form method="POST" action="<?php echo Router::url('users/create'); ?>" id="createUserForm">
-                            <div class="mb-3">
-                                <label for="full_name" class="form-label">Ho va ten <span class="text-danger">*</span></label>
-                                <input type="text" 
-                                       class="form-control <?php echo isset($errors['full_name']) ? 'is-invalid' : ''; ?>" 
-                                       id="full_name" 
-                                       name="full_name" 
-                                       value="<?php echo Helper::escape($formData['full_name'] ?? ''); ?>"
-                                       placeholder="Nguyen Van A"
-                                       required
-                                       autofocus>
-                                <?php if (isset($errors['full_name'])): ?>
-                                    <div class="invalid-feedback">
-                                        <?php echo Helper::escape($errors['full_name'][0]); ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email (Gmail) <span class="text-danger">*</span></label>
-                                <input type="email" 
-                                       class="form-control <?php echo isset($errors['email']) ? 'is-invalid' : ''; ?>" 
-                                       id="email" 
-                                       name="email" 
-                                       value="<?php echo Helper::escape($formData['email'] ?? ''); ?>"
-                                       placeholder="nguyenvana@gmail.com"
-                                       required>
-                                <?php if (isset($errors['email'])): ?>
-                                    <div class="invalid-feedback">
-                                        <?php echo Helper::escape($errors['email'][0]); ?>
-                                    </div>
-                                <?php endif; ?>
-                                <small class="form-text text-muted">
-                                    Email nay se duoc su dung lam ten dang nhap (phan truoc dau @)
-                                </small>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="phone" class="form-label">Dien thoai</label>
-                                <input type="tel" 
-                                       class="form-control" 
-                                       id="phone" 
-                                       name="phone" 
-                                       value="<?php echo Helper::escape($formData['phone'] ?? ''); ?>"
-                                       placeholder="0912345678">
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="role" class="form-label">Vai tro <span class="text-danger">*</span></label>
-                                <select class="form-select <?php echo isset($errors['role']) ? 'is-invalid' : ''; ?>" 
-                                        id="role" 
-                                        name="role" 
-                                        required>
-                                    <option value="salesperson" <?php echo ($formData['role'] ?? 'salesperson') == 'salesperson' ? 'selected' : ''; ?>>
-                                        Nhan vien ban hang
-                                    </option>
-                                    <option value="admin" <?php echo ($formData['role'] ?? '') == 'admin' ? 'selected' : ''; ?>>
-                                        Quan tri vien
-                                    </option>
-                                </select>
-                                <?php if (isset($errors['role'])): ?>
-                                    <div class="invalid-feedback">
-                                        <?php echo Helper::escape($errors['role'][0]); ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-submit">
-                                    Tao nhan vien va gui email
-                                </button>
-                                <a href="<?php echo Router::url('users'); ?>" class="btn btn-secondary">
-                                    Huy
-                                </a>
-                            </div>
-                        </form>
-                    </div>
+                    <?php endif; ?>
+
+                    <form method="POST"
+                          action="<?php echo Router::url('users/create'); ?>"
+                          id="createUserForm">
+
+                        <!-- Họ và tên -->
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label">
+                                Họ và tên <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="text"
+                                   class="form-control <?php echo isset($errors['full_name']) ? 'is-invalid' : ''; ?>"
+                                   id="full_name"
+                                   name="full_name"
+                                   value="<?php echo Helper::escape($formData['full_name'] ?? ''); ?>"
+                                   placeholder="Nguyễn Văn A"
+                                   required
+                                   autofocus>
+
+                            <?php if (isset($errors['full_name'])): ?>
+                                <div class="invalid-feedback">
+                                    <?php echo Helper::escape($errors['full_name'][0]); ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                Email (Gmail) <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="email"
+                                   class="form-control <?php echo isset($errors['email']) ? 'is-invalid' : ''; ?>"
+                                   id="email"
+                                   name="email"
+                                   value="<?php echo Helper::escape($formData['email'] ?? ''); ?>"
+                                   placeholder="nguyenvana@gmail.com"
+                                   required>
+
+                            <?php if (isset($errors['email'])): ?>
+                                <div class="invalid-feedback">
+                                    <?php echo Helper::escape($errors['email'][0]); ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <small class="form-text text-muted">
+                                Email này sẽ được sử dụng làm tên đăng nhập (phần trước dấu @)
+                            </small>
+                        </div>
+
+                        <!-- Điện thoại -->
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Điện thoại</label>
+
+                            <input type="tel"
+                                   class="form-control"
+                                   id="phone"
+                                   name="phone"
+                                   value="<?php echo Helper::escape($formData['phone'] ?? ''); ?>"
+                                   placeholder="0912345678">
+                        </div>
+
+                        <!-- Vai trò -->
+                        <div class="mb-4">
+                            <label for="role" class="form-label">
+                                Vai trò <span class="text-danger">*</span>
+                            </label>
+
+                            <select class="form-select <?php echo isset($errors['role']) ? 'is-invalid' : ''; ?>"
+                                    id="role"
+                                    name="role"
+                                    required>
+
+                                <option value="salesperson"
+                                    <?php echo ($formData['role'] ?? 'salesperson') == 'salesperson' ? 'selected' : ''; ?>>
+                                    Nhân viên bán hàng
+                                </option>
+
+                                <option value="admin"
+                                    <?php echo ($formData['role'] ?? '') == 'admin' ? 'selected' : ''; ?>>
+                                    Quản trị viên
+                                </option>
+                            </select>
+
+                            <?php if (isset($errors['role'])): ?>
+                                <div class="invalid-feedback">
+                                    <?php echo Helper::escape($errors['role'][0]); ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-submit">
+                                Tạo nhân viên và gửi email
+                            </button>
+
+                            <a href="<?php echo Router::url('users'); ?>"
+                               class="btn btn-secondary">
+                                Hủy
+                            </a>
+                        </div>
+
+                    </form>
                 </div>
             </div>
+
         </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        document.getElementById('createUserForm').addEventListener('submit', function(e) {
-            const email = document.getElementById('email').value;
-            
-            if (!email.endsWith('@gmail.com')) {
-                if (!confirm('Email khong phai Gmail. Ban co muon tiep tuc?')) {
-                    e.preventDefault();
-                    return false;
-                }
-            }
-        });
-    </script>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.getElementById('createUserForm').addEventListener('submit', function(e) {
+    const email = document.getElementById('email').value;
+
+    if (!email.endsWith('@gmail.com')) {
+        if (!confirm('Email không phải Gmail. Bạn có muốn tiếp tục?')) {
+            e.preventDefault();
+            return false;
+        }
+    }
+});
+</script>
+
 </body>
 </html>

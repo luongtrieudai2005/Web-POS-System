@@ -226,7 +226,7 @@ class UserController {
         $user = User::getById($id);
         
         if (!$user) {
-            Session::setFlash('error', 'Khong tim thay nhan vien', 'danger');
+            Session::setFlash('error', 'Không tìm thấy nhân viên', 'danger');
             Router::redirect(Router::url('users/index.php'));
             exit;
         }
@@ -240,7 +240,7 @@ class UserController {
         $status = Helper::post('status', '');
         
         if (!in_array($status, ['active', 'inactive', 'locked'])) {
-            Session::setFlash('error', 'Trang thai khong hop le', 'danger');
+            Session::setFlash('error', 'Trạng thái không hợp lệ', 'danger');
             Router::redirect(Router::url('users/index.php'));
             exit;
         }
@@ -251,7 +251,7 @@ class UserController {
             if ($result) {
                 Session::setFlash('success', 'Thay doi trang thai thanh cong', 'success');
             } else {
-                Session::setFlash('error', 'Co loi xay ra', 'danger');
+                Session::setFlash('error', 'Có lỗi xảy ra', 'danger');
             }
         } catch (Exception $e) {
             Session::setFlash('error', $e->getMessage(), 'danger');
@@ -272,13 +272,13 @@ class UserController {
         $user = User::getById($id);
         
         if (!$user) {
-            Session::setFlash('error', 'Khong tim thay nhan vien', 'danger');
+            Session::setFlash('error', 'Không tìm thấy nhân viên', 'danger');
             Router::redirect(Router::url('users/index.php'));
             exit;
         }
         
         if ($user['id'] == 1) {
-            Session::setFlash('error', 'Khong the xoa tai khoan admin chinh', 'danger');
+            Session::setFlash('error', 'Không thể xóa tài khoản admin chính', 'danger');
             Router::redirect(Router::url('users/index.php'));
             exit;
         }
@@ -287,9 +287,9 @@ class UserController {
             $result = User::delete($id);
             
             if ($result) {
-                Session::setFlash('success', 'Xoa nhan vien thanh cong', 'success');
+                Session::setFlash('success', 'Xóa nhân viên thành công', 'success');
             } else {
-                Session::setFlash('error', 'Co loi xay ra', 'danger');
+                Session::setFlash('error', 'Có lỗi xảy ra', 'danger');
             }
         } catch (Exception $e) {
             Session::setFlash('error', $e->getMessage(), 'danger');
