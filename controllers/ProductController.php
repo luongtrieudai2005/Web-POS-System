@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../config/bootstrap.php';
 require_once __DIR__ . '/../models/Product.php';
 require_once __DIR__ . '/../models/Category.php';
@@ -6,8 +7,8 @@ require_once __DIR__ . '/../models/Category.php';
 class ProductController {
     
     /**
-     * Hien thi danh sach san pham
-     * Ca admin va nhan vien deu xem duoc, nhung hien thi khac nhau
+     * Hiển thị danh sách sản phẩm
+     * Cả admin và nhân viên đều xem được, nhưng hiển thị khác nhau
      */
     public static function index() {
         Auth::requireLogin();
@@ -27,7 +28,7 @@ class ProductController {
     }
     
     /**
-     * Hien thi form them san pham (CHI ADMIN)
+     * Hiển thị form thêm sản phẩm mới (CHỈ ADMIN)
      */
     public static function create() {
         Auth::requireAdmin();
@@ -60,11 +61,11 @@ class ProductController {
                 $errors = $validator->errors();
             } else {
                 if (Product::barcodeExists($formData['barcode'])) {
-                    $errors['barcode'] = ['Barcode da ton tai trong he thong'];
+                    $errors['barcode'] = ['Mã vạch đã tồn tại trong hệ thống'];
                 }
                 
                 if ($formData['retail_price'] <= $formData['import_price']) {
-                    $errors['retail_price'] = ['Gia ban phai lon hon gia nhap'];
+                    $errors['retail_price'] = ['Giá bán phải lớn hơn giá nhập'];
                 }
             }
             
@@ -73,11 +74,11 @@ class ProductController {
                     $productId = Product::create($formData);
                     
                     if ($productId) {
-                        Session::setFlash('success', 'Them san pham thanh cong', 'success');
+                        Session::setFlash('success', 'Thêm sản phẩm thành công', 'success');
                         Router::redirect(Router::url('products/index.php'));
                         exit;
                     } else {
-                        $errors['general'] = 'Co loi xay ra khi them san pham';
+                        $errors['general'] = 'Có lỗi xảy ra khi thêm sản phẩm';
                     }
                 } catch (Exception $e) {
                     $errors['general'] = $e->getMessage();
@@ -91,7 +92,7 @@ class ProductController {
     }
     
     /**
-     * Hien thi form chinh sua san pham (CHI ADMIN)
+     * Hiển thị form chỉnh sửa sản phẩm (CHỈ ADMIN)
      */
     public static function edit($id) {
         Auth::requireAdmin();
@@ -99,7 +100,7 @@ class ProductController {
         $product = Product::getById($id);
         
         if (!$product) {
-            Session::setFlash('error', 'Khong tim thay san pham', 'danger');
+            Session::setFlash('error', 'Không tìm thấy sản phẩm', 'danger');
             Router::redirect(Router::url('products/index.php'));
             exit;
         }
@@ -131,11 +132,11 @@ class ProductController {
                 $errors = $validator->errors();
             } else {
                 if (Product::barcodeExists($formData['barcode'], $id)) {
-                    $errors['barcode'] = ['Barcode da ton tai trong he thong'];
+                    $errors['barcode'] = ['Mã vạch đã tồn tại trong hệ thống'];
                 }
                 
                 if ($formData['retail_price'] <= $formData['import_price']) {
-                    $errors['retail_price'] = ['Gia ban phai lon hon gia nhap'];
+                    $errors['retail_price'] = ['Giá bán phải lớn hơn giá nhập'];
                 }
             }
             
@@ -144,11 +145,11 @@ class ProductController {
                     $result = Product::update($id, $formData);
                     
                     if ($result) {
-                        Session::setFlash('success', 'Cap nhat san pham thanh cong', 'success');
+                        Session::setFlash('success', 'Cập nhật sản phẩm thành công', 'success');
                         Router::redirect(Router::url('products/index.php'));
                         exit;
                     } else {
-                        $errors['general'] = 'Co loi xay ra khi cap nhat';
+                        $errors['general'] = 'Có lỗi xảy ra khi cập nhật';
                     }
                 } catch (Exception $e) {
                     $errors['general'] = $e->getMessage();
@@ -162,7 +163,7 @@ class ProductController {
     }
     
     /**
-     * Xoa san pham (CHI ADMIN)
+     * Xóa sản phẩm (CHỈ ADMIN)
      */
     public static function delete($id) {
         Auth::requireAdmin();
@@ -175,7 +176,7 @@ class ProductController {
         $product = Product::getById($id);
         
         if (!$product) {
-            Session::setFlash('error', 'Khong tim thay san pham', 'danger');
+            Session::setFlash('error', 'Không tìm thấy sản phẩm', 'danger');
             Router::redirect(Router::url('products/index.php'));
             exit;
         }
@@ -184,9 +185,9 @@ class ProductController {
             $result = Product::delete($id);
             
             if ($result) {
-                Session::setFlash('success', 'Xoa san pham thanh cong', 'success');
+                Session::setFlash('success', 'Xóa sản phẩm thành công', 'success');
             } else {
-                Session::setFlash('error', 'Co loi xay ra', 'danger');
+                Session::setFlash('error', 'Có lỗi xảy ra', 'danger');
             }
         } catch (Exception $e) {
             Session::setFlash('error', $e->getMessage(), 'danger');
@@ -197,15 +198,15 @@ class ProductController {
     }
     
     /**
-     * Tim kiem san pham (dung cho POS)
-     * API endpoint tra ve JSON
+     * Tìm kiếm sản phẩm (dùng cho POS)
+     * API endpoint trả về JSON
      */
     public static function search() {
         Auth::requireLogin();
         
         if (!Helper::isAjax()) {
             http_response_code(400);
-            echo json_encode(['error' => 'Invalid request']);
+            echo json_encode(['error' => 'Yêu cầu không hợp lệ']);
             exit;
         }
         
@@ -242,15 +243,15 @@ class ProductController {
     }
     
     /**
-     * Lay thong tin chi tiet san pham theo barcode (dung cho POS)
-     * API endpoint tra ve JSON
+     * Lấy thông tin chi tiết sản phẩm theo mã vạch (dùng cho POS)
+     * API endpoint trả về JSON
      */
     public static function getByBarcode($barcode) {
         Auth::requireLogin();
         
         if (!Helper::isAjax()) {
             http_response_code(400);
-            echo json_encode(['error' => 'Invalid request']);
+            echo json_encode(['error' => 'Yêu cầu không hợp lệ']);
             exit;
         }
         
@@ -259,13 +260,13 @@ class ProductController {
             
             if (!$product) {
                 http_response_code(404);
-                echo json_encode(['error' => 'San pham khong ton tai']);
+                echo json_encode(['error' => 'Sản phẩm không tồn tại']);
                 exit;
             }
             
             if ($product['stock_quantity'] <= 0) {
                 http_response_code(400);
-                echo json_encode(['error' => 'San pham da het hang']);
+                echo json_encode(['error' => 'Sản phẩm đã hết hàng']);
                 exit;
             }
             
@@ -287,7 +288,7 @@ class ProductController {
     }
     
     /**
-     * Cap nhat so luong ton kho (dung cho admin quan ly kho)
+     * Cập nhật số lượng tồn kho (dùng cho admin quản lý kho)
      */
     public static function updateStock($id) {
         Auth::requireAdmin();
@@ -300,7 +301,7 @@ class ProductController {
         $product = Product::getById($id);
         
         if (!$product) {
-            Session::setFlash('error', 'Khong tim thay san pham', 'danger');
+            Session::setFlash('error', 'Không tìm thấy sản phẩm', 'danger');
             Router::redirect(Router::url('products/index.php'));
             exit;
         }
@@ -308,7 +309,7 @@ class ProductController {
         $newQuantity = Helper::post('stock_quantity', 0);
         
         if ($newQuantity < 0) {
-            Session::setFlash('error', 'So luong khong hop le', 'danger');
+            Session::setFlash('error', 'Số lượng không hợp lệ', 'danger');
             Router::redirect(Router::url('products/index.php'));
             exit;
         }
@@ -317,9 +318,9 @@ class ProductController {
             $result = Product::updateStock($id, $newQuantity);
             
             if ($result) {
-                Session::setFlash('success', 'Cap nhat ton kho thanh cong', 'success');
+                Session::setFlash('success', 'Cập nhật tồn kho thành công', 'success');
             } else {
-                Session::setFlash('error', 'Co loi xay ra', 'danger');
+                Session::setFlash('error', 'Có lỗi xảy ra', 'danger');
             }
         } catch (Exception $e) {
             Session::setFlash('error', $e->getMessage(), 'danger');

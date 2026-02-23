@@ -1,0 +1,137 @@
+/* public/assets/css/pos-styles.css */
+
+.pos-navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.pos-navbar .nav-link {
+    color: rgba(255,255,255,0.85) !important;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.pos-navbar .nav-link:hover,
+.pos-navbar .nav-link.active {
+    color: #fff !important;
+    background: rgba(255,255,255,0.15);
+}
+
+.pos-navbar .dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    border-radius: 10px;
+}
+
+.pos-navbar .dropdown-item:hover,
+.pos-navbar .dropdown-item.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+}
+
+body {
+    background: #f0f2f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.main-card {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border: none;
+}
+
+.main-card .card-header {
+    background: #fff;
+    border-bottom: 2px solid #f0f0f0;
+    border-radius: 15px 15px 0 0;
+    padding: 20px 24px;
+}
+
+.btn-primary-grad {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary-grad:hover {
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+}
+
+.stat-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+}
+
+.stat-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #fff;
+    margin-bottom: 14px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 6px 0 4px;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.content-wrapper {
+    padding: 30px 0;
+}
+
+.flash-message {
+    border-radius: 10px;
+    border: none;
+}
+
+.table thead th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.badge-role-admin { background: #dc3545; }
+.badge-role-sales { background: #0d6efd; }
+
+.stock-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.stock-good { background: #d1f5e0; color: #0a7c42; }
+.stock-low  { background: #fff3cd; color: #856404; }
+.stock-out  { background: #f8d7da; color: #721c24; }

@@ -31,7 +31,7 @@ define('SESSION_LIFETIME', 3600); // 1 hour
 define('UPLOAD_MAX_SIZE', 5 * 1024 * 1024); // 5MB
 define('UPLOAD_ALLOWED_TYPES', ['jpg', 'jpeg', 'png', 'gif', 'pdf']);
 
-// Email Settings (cho tính năng gửi email)
+// Email Settings
 define('MAIL_HOST', 'smtp.gmail.com');
 define('MAIL_PORT', 587);
 define('MAIL_USERNAME', 'luongtrieudai0902@gmail.com');

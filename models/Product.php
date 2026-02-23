@@ -186,7 +186,7 @@ class Product {
         );
         
         if ($orderDetailCount['count'] > 0) {
-            throw new Exception('Khong the xoa san pham da co trong don hang');
+            throw new Exception('Không thể xóa sản phẩm đã có trong đơn hàng');
         }
         
         return self::$db->execute(

@@ -1,8 +1,4 @@
 <?php
-/**
- * Entry Point - Bootstrap File
- * Tat ca request deu di qua file nay
- */
 
 // Load cac file config
 require_once __DIR__ . '/../config/database.php';

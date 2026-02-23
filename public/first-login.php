@@ -35,11 +35,11 @@ if (Helper::isPost()) {
             
             if ($result) {
                 // Thanh cong
-                Session::setFlash('success', 'Doi mat khau thanh cong! Ban co the su dung he thong binh thuong.', 'success');
+                Session::setFlash('success', 'Đổi mật khẩu thành công! Bạn có thể sử dụng hệ thống bình thường.', 'success');
                 Router::redirect(Router::url('dashboard'));
                 exit;
             } else {
-                $errors['general'] = 'Co loi xay ra. Vui long thu lai.';
+                $errors['general'] = 'Có lỗi xảy ra. Vui lòng thử lại.';
             }
         } catch (Exception $e) {
             $errors['general'] = $e->getMessage();

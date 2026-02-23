@@ -127,7 +127,8 @@ class Session {
             'full_name' => $user['full_name'],
             'role' => $user['role'],
             'avatar' => $user['avatar'],
-            'is_first_login' => $user['is_first_login']
+            'is_first_login' => $user['is_first_login'],
+            'created_at' => $user['created_at']
         ]);
     }
     

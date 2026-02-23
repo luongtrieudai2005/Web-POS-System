@@ -1,9 +1,13 @@
 <?php
+
 require_once __DIR__ . '/../config/bootstrap.php';
 require_once __DIR__ . '/../models/Category.php';
 
 class CategoryController {
     
+    /**
+     * Hiển thị danh sách danh mục sản phẩm
+     */
     public static function index() {
         Auth::requireAdmin();
         
@@ -17,6 +21,9 @@ class CategoryController {
         require_once __DIR__ . '/../views/categories/index.php';
     }
     
+    /**
+     * Thêm danh mục sản phẩm mới
+     */
     public static function create() {
         Auth::requireAdmin();
         
@@ -38,7 +45,7 @@ class CategoryController {
                 $errors = $validator->errors();
             } else {
                 if (Category::nameExists($formData['name'])) {
-                    $errors['name'] = ['Ten danh muc da ton tai'];
+                    $errors['name'] = ['Tên danh mục đã tồn tại'];
                 }
             }
             
@@ -47,11 +54,11 @@ class CategoryController {
                     $categoryId = Category::create($formData);
                     
                     if ($categoryId) {
-                        Session::setFlash('success', 'Them danh muc thanh cong', 'success');
+                        Session::setFlash('success', 'Thêm danh mục thành công', 'success');
                         Router::redirect(Router::url('categories/index.php'));
                         exit;
                     } else {
-                        $errors['general'] = 'Co loi xay ra khi them danh muc';
+                        $errors['general'] = 'Có lỗi xảy ra khi thêm danh mục';
                     }
                 } catch (Exception $e) {
                     $errors['general'] = $e->getMessage();
@@ -62,13 +69,16 @@ class CategoryController {
         require_once __DIR__ . '/../views/categories/create.php';
     }
     
+    /**
+     * Sửa thông tin danh mục sản phẩm
+     */
     public static function edit($id) {
         Auth::requireAdmin();
         
         $category = Category::getById($id);
         
         if (!$category) {
-            Session::setFlash('error', 'Khong tim thay danh muc', 'danger');
+            Session::setFlash('error', 'Không tìm thấy danh mục', 'danger');
             Router::redirect(Router::url('categories/index.php'));
             exit;
         }
@@ -90,7 +100,7 @@ class CategoryController {
                 $errors = $validator->errors();
             } else {
                 if (Category::nameExists($formData['name'], $id)) {
-                    $errors['name'] = ['Ten danh muc da ton tai'];
+                    $errors['name'] = ['Tên danh mục đã tồn tại'];
                 }
             }
             
@@ -99,11 +109,11 @@ class CategoryController {
                     $result = Category::update($id, $formData);
                     
                     if ($result) {
-                        Session::setFlash('success', 'Cap nhat danh muc thanh cong', 'success');
+                        Session::setFlash('success', 'Cập nhật danh mục thành công', 'success');
                         Router::redirect(Router::url('categories/index.php'));
                         exit;
                     } else {
-                        $errors['general'] = 'Co loi xay ra khi cap nhat';
+                        $errors['general'] = 'Có lỗi xảy ra khi cập nhật';
                     }
                 } catch (Exception $e) {
                     $errors['general'] = $e->getMessage();
@@ -114,6 +124,9 @@ class CategoryController {
         require_once __DIR__ . '/../views/categories/edit.php';
     }
     
+    /**
+     * Xóa danh mục sản phẩm
+     */
     public static function delete($id) {
         Auth::requireAdmin();
         
@@ -125,7 +138,7 @@ class CategoryController {
         $category = Category::getById($id);
         
         if (!$category) {
-            Session::setFlash('error', 'Khong tim thay danh muc', 'danger');
+            Session::setFlash('error', 'Không tìm thấy danh mục', 'danger');
             Router::redirect(Router::url('categories/index.php'));
             exit;
         }
@@ -134,9 +147,9 @@ class CategoryController {
             $result = Category::delete($id);
             
             if ($result) {
-                Session::setFlash('success', 'Xoa danh muc thanh cong', 'success');
+                Session::setFlash('success', 'Xóa danh mục thành công', 'success');
             } else {
-                Session::setFlash('error', 'Co loi xay ra', 'danger');
+                Session::setFlash('error', 'Có lỗi xảy ra', 'danger');
             }
         } catch (Exception $e) {
             Session::setFlash('error', $e->getMessage(), 'danger');
